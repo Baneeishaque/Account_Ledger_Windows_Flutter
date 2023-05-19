@@ -35,6 +35,8 @@ class _MyHomePageState extends State<MyHomePage> {
       MethodChannel('samples.flutter.io/battery');
 
   String _batteryLevel = 'Battery level: unknown.';
+  String _gistData = 'Gist Data: N/A';
+  bool _isOnWait = false;
 
   Future<void> _getBatteryLevel() async {
     String batteryLevel;
@@ -53,6 +55,23 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Future<void> _getGistData() async {
+    setState(() {
+      _isOnWait = true;
+    });
+    String gistData;
+    try {
+      String? result = await methodChannel.invokeMethod<String>('getGistData');
+      gistData = 'Gist Data: $result';
+    } on PlatformException catch (e) {
+      gistData = 'Gist Data: Error - ${e.message}';
+    }
+    setState(() {
+      _isOnWait = false;
+      _gistData = gistData;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,14 +83,16 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(_batteryLevel, key: const Key('Battery level label')),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ElevatedButton(
-                onPressed: _getBatteryLevel,
-                child: const Text('Refresh'),
-              ),
-            ),
+            Text(_gistData, key: const Key('Gist data label')),
+            _isOnWait
+                ? const CircularProgressIndicator()
+                : Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: ElevatedButton(
+                      onPressed: _getGistData,
+                      child: const Text('Get Gist Data'),
+                    ),
+                  ),
           ],
         ),
       ),

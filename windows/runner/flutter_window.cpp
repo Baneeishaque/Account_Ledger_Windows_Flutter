@@ -12,6 +12,10 @@
 
 #include "flutter/generated_plugin_registrant.h"
 
+#include "../../account_ledger_lib_kotlin_native/lib/build/bin/native/debugShared/native_api.h"
+
+using namespace std;
+
 static constexpr int kBatteryError = -1;
 static constexpr int kNoBattery = -2;
 
@@ -65,8 +69,18 @@ bool FlutterWindow::OnCreate() {
                 } else {
                   result->Success(battery_level);
                 }
+              } else if (call.method_name() == "getGistData") {
+
+                native_ExportedSymbols *lib = native_symbols();
+
+                native_kref_account_ledger_library_utils_GistUtils newInstance = lib->kotlin.root.account_ledger_library.utils.GistUtils.GistUtils();
+                string accountLedgerGistText  = lib->kotlin.root.account_ledger_library.utils.GistUtils.processGistIdForTextData(newInstance, "USERNAME", "GITHUB_ACCESS_TOKEN", "GIST_ID", false, false);
+                lib->DisposeStablePointer(newInstance.pinned);
+
+                result->Success(accountLedgerGistText);
+
               } else {
-                result->NotImplemented();
+                  result->NotImplemented();
               }
           });
 
