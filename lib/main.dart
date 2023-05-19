@@ -34,26 +34,8 @@ class _MyHomePageState extends State<MyHomePage> {
   static const MethodChannel methodChannel =
       MethodChannel('samples.flutter.io/battery');
 
-  String _batteryLevel = 'Battery level: unknown.';
   String _gistData = 'Gist Data: N/A';
   bool _isOnWait = false;
-
-  Future<void> _getBatteryLevel() async {
-    String batteryLevel;
-    try {
-      final int? result = await methodChannel.invokeMethod('getBatteryLevel');
-      batteryLevel = 'Battery level: $result%.';
-    } on PlatformException catch (e) {
-      if (e.code == 'NO_BATTERY') {
-        batteryLevel = 'No battery.';
-      } else {
-        batteryLevel = 'Failed to get battery level.';
-      }
-    }
-    setState(() {
-      _batteryLevel = batteryLevel;
-    });
-  }
 
   Future<void> _getGistData() async {
     setState(() {
