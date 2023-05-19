@@ -63,18 +63,33 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            Text(_gistData, key: const Key('Gist data label')),
             _isOnWait
-                ? const CircularProgressIndicator()
-                : Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: ElevatedButton(
-                      onPressed: _getGistData,
-                      child: const Text('Get Gist Data'),
+                ? const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: CircularProgressIndicator(),
+                  )
+                : SizedBox(
+                    width: double.infinity,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: OutlinedButton(
+                        onPressed: _getGistData,
+                        child: const Text(
+                          'Get Gist Data',
+                        ),
+                      ),
                     ),
                   ),
+            Padding(
+              padding: const EdgeInsets.only(
+                left: 16.0,
+                right: 16.0,
+                bottom: 16.0,
+              ),
+              child: Text(_gistData, key: const Key('Gist data label')),
+            ),
           ],
         ),
       ),
