@@ -40,6 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _getGistData() async {
     setState(() {
       _isOnWait = true;
+      _gistData = 'Gist Data: N/A';
     });
     String gistData;
     try {
