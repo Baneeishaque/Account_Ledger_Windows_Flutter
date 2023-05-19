@@ -45,6 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
     String gistData;
     try {
       String? result = await methodChannel.invokeMethod<String>('getGistData');
+      debugPrint(result);
       gistData = 'Gist Data: $result';
     } on PlatformException catch (e) {
       gistData = 'Gist Data: Error - ${e.message}';
