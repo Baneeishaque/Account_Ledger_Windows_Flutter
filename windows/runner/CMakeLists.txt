@@ -14,7 +14,7 @@ add_executable(${BINARY_NAME} WIN32
   "${FLUTTER_MANAGED_DIR}/generated_plugin_registrant.cc"
   "Runner.rc"
   "runner.exe.manifest"
-  "../../account_ledger_lib_kotlin_native/lib/build/bin/native/debugShared/native_api.h"
+  "../../account_ledger_lib_kotlin_native/lib/build/bin/mingwX64/debugShared/account_ledger_lib_api.h"
 )
 
 # Apply the standard set of build settings. This can be removed for applications
@@ -42,8 +42,8 @@ add_dependencies(${BINARY_NAME} flutter_assemble)
 
 add_library(kotlin_native SHARED IMPORTED)
 set_target_properties(kotlin_native PROPERTIES
-        IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/../../account_ledger_lib_kotlin_native/lib/build/bin/native/debugShared/native.lib"
-        IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/../../account_ledger_lib_kotlin_native/lib/build/bin/native/debugShared/native.dll")
+        IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/../../account_ledger_lib_kotlin_native/lib/build/bin/mingwX64/debugShared/account_ledger_lib.lib"
+        IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/../../account_ledger_lib_kotlin_native/lib/build/bin/mingwX64/debugShared/account_ledger_lib.dll")
 target_link_libraries(${BINARY_NAME} PRIVATE kotlin_native)
 add_custom_command(TARGET ${BINARY_NAME} POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:${BINARY_NAME}> $<TARGET_RUNTIME_DLLS:${BINARY_NAME}>
