@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="compileMainCFile.ps1 on account_ledger_lib_kotlin_native" type="PowerShellRunType" factoryName="PowerShell" scriptUrl="C:\Lab_Data\Account_Ledger_Windows_Flutter\account_ledger_lib_kotlin_native\compileMainCFile.ps1" workingDirectory="C:\Lab_Data\Account_Ledger_Windows_Flutter\account_ledger_lib_kotlin_native" executablePath="$PROJECT_DIR$/../../Windows/System32/WindowsPowerShell/v1.0/powershell.exe">
+    <envs>
+      <env name="JAVA_HOME" value="C:\Users\dk\.jabba\jdk\openjdk@20.0.1" />
+    </envs>
+    <method v="2" />
+  </configuration>
+</component>
