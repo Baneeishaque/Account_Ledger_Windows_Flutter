@@ -54,7 +54,12 @@ class _MyHomePageState extends State<MyHomePage> {
   int _currentDateIndex = 0;
   String _currentEventTime = "09:05:00";
   int _currentTransactionIndex = 0;
-  static const List<String> list = <String>['Normal', 'Two-Way', '1->2, 3->1'];
+  static const List<String> list = <String>[
+    'Normal',
+    'Two-Way',
+    '1->2, 3->1',
+    '1->2, 2->3 (Via.)',
+  ];
   String dropdownValue = list.first;
   bool _isNotProcessingTransaction = true;
   late TextEditingController _secondAccountIDController;
@@ -272,7 +277,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                   ),
                                 ),
                                 ((dropdownValue == "Two-Way") ||
-                                        (dropdownValue == "1->2, 3->1"))
+                                        (dropdownValue == "1->2, 3->1") ||
+                                        (dropdownValue == "1->2, 2->3 (Via.)"))
                                     ? Column(
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
@@ -310,7 +316,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                         ],
                                       )
                                     : Container(),
-                                (dropdownValue == "1->2, 3->1")
+                                ((dropdownValue == "1->2, 3->1") ||
+                                        (dropdownValue == "1->2, 2->3 (Via.)"))
                                     ? getTopPaddingWidget(
                                         widget: TextField(
                                             controller:
@@ -398,8 +405,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                                     height: 80,
                                                     dismissable: false,
                                                   ).show(context);
-                                                } else if ((dropdownValue ==
-                                                        "1->2, 3->1") &&
+                                                } else if (((dropdownValue ==
+                                                            "1->2, 3->1") ||
+                                                        (dropdownValue ==
+                                                            "1->2, 2->3 (Via.)")) &&
                                                     (_secondTransactionAmountController
                                                         .text.isEmpty)) {
                                                   MotionToast.error(
@@ -580,6 +589,44 @@ class _MyHomePageState extends State<MyHomePage> {
     } else if (dropdownValue == "1->2, 3->1") {
       accountLedgerApiResultMessage =
           await runAccountLedgerInsertOneTwoThreeOneTransactionOperationAsync(
+              TransactionModal(
+                  u32(accountLedgerGistModelV2.userId!),
+                  "${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactionDate} $_currentEventTime",
+                  accountLedgerGistModelV2
+                      .accountLedgerPages![_currentAccountIndex]
+                      .transactionDatePages![_currentDateIndex]
+                      .transactions![_currentTransactionIndex]
+                      .transactionParticulars!,
+                  accountLedgerGistModelV2
+                      .accountLedgerPages![_currentAccountIndex]
+                      .transactionDatePages![_currentDateIndex]
+                      .transactions![_currentTransactionIndex]
+                      .transactionAmount!,
+                  accountLedgerGistModelV2
+                          .accountLedgerPages![_currentAccountIndex]
+                          .transactionDatePages![_currentDateIndex]
+                          .transactions![_currentTransactionIndex]
+                          .transactionAmount!
+                          .isNegative
+                      ? u32(accountLedgerGistModelV2
+                          .accountLedgerPages![_currentAccountIndex].accountId!)
+                      : u32.parse(_secondAccountIDController.text),
+                  accountLedgerGistModelV2
+                          .accountLedgerPages![_currentAccountIndex]
+                          .transactionDatePages![_currentDateIndex]
+                          .transactions![_currentTransactionIndex]
+                          .transactionAmount!
+                          .isNegative
+                      ? u32.parse(_secondAccountIDController.text)
+                      : u32(accountLedgerGistModelV2
+                          .accountLedgerPages![_currentAccountIndex]
+                          .accountId!)),
+              u32.parse(_thirdAccountIDController.text),
+              _secondTransactionParticularsController.text,
+              double.parse(_secondTransactionAmountController.text));
+    } else if (dropdownValue == "1->2, 2->3 (Via.)") {
+      accountLedgerApiResultMessage =
+          await runAccountLedgerInsertOneTwoTwoThreeTransactionOperationAsync(
               TransactionModal(
                   u32(accountLedgerGistModelV2.userId!),
                   "${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactionDate} $_currentEventTime",
