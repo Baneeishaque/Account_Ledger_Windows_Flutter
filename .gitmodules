@@ -1,3 +1,6 @@
 [submodule "account_ledger_lib_kotlin_native"]
 	path = account_ledger_lib_kotlin_native
 	url = https://github.com/Baneeishaque/Account-Ledger-Library-Kotlin-Native.git
+[submodule "account_ledger_library_dart"]
+	path = account_ledger_library_dart
+	url = https://github.com/Baneeishaque/account_ledger_library_dart.git

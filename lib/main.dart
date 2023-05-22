@@ -1,7 +1,14 @@
 import 'dart:convert';
 
+import 'package:account_ledger_library_dart/account_ledger_api_result_message_modal.dart';
+import 'package:account_ledger_library_dart/date_time_utils.dart';
+import 'package:account_ledger_library_dart/transaction_modal.dart';
+import 'package:account_ledger_library_dart/transaction_utils_api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:integer/integer.dart';
+import 'package:motion_toast/motion_toast.dart';
+import 'package:motion_toast/resources/arrays.dart';
 
 import 'account_ledger_gist_model_v2.dart';
 
@@ -15,12 +22,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Account Ledger Windows',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Account Ledger Home'),
     );
   }
 }
@@ -45,10 +52,16 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _isProcessingData = false;
   int _currentAccountIndex = 0;
   int _currentDateIndex = 0;
-  String _currentEventTime = "09:00";
+  String _currentEventTime = "09:05:00";
   int _currentTransactionIndex = 0;
-  static const List<String> list = <String>['Normal', 'Two-Way'];
+  static const List<String> list = <String>['Normal', 'Two-Way', '1->2, 3->1'];
   String dropdownValue = list.first;
+  bool _isNotProcessingTransaction = true;
+  late TextEditingController _secondAccountIDController;
+  late TextEditingController _secondTransactionParticularsController;
+  late TextEditingController _secondTransactionAmountController;
+  String _apiResult = 'API Result : N/A';
+  late TextEditingController _thirdAccountIDController;
 
   Widget getFullWidthOutlinedButton({
     required String text,
@@ -100,6 +113,15 @@ class _MyHomePageState extends State<MyHomePage> {
       _gistData = gistData;
       _isDataLoaded = true;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _secondAccountIDController = TextEditingController();
+    _secondTransactionParticularsController = TextEditingController();
+    _secondTransactionAmountController = TextEditingController();
+    _thirdAccountIDController = TextEditingController();
   }
 
   @override
@@ -213,21 +235,24 @@ class _MyHomePageState extends State<MyHomePage> {
                                         ],
                                       ),
                                 getTopPaddingWidget(
-                                    widget: const TextField(
-                                        decoration: InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  labelText: 'Second A/C ID',
-                                ))),
+                                    padding: const EdgeInsets.only(
+                                      top: 16.0,
+                                      bottom: 16.0,
+                                    ),
+                                    widget: TextField(
+                                        controller: _secondAccountIDController,
+                                        enabled: _isNotProcessingTransaction,
+                                        keyboardType: TextInputType.number,
+                                        decoration: const InputDecoration(
+                                          border: OutlineInputBorder(),
+                                          labelText: 'Second A/C ID',
+                                        ))),
                                 SizedBox(
                                   width: double.infinity,
                                   child: DropdownButton<String>(
                                     alignment: Alignment.center,
-                                    // padding: const EdgeInsets.only(
-                                    //   top: 16.0,
-                                    // ),
                                     value: dropdownValue,
                                     onChanged: (String? value) {
-                                      // This is called when the user selects an item.
                                       setState(() {
                                         dropdownValue = value!;
                                         debugPrint(dropdownValue);
@@ -246,27 +271,171 @@ class _MyHomePageState extends State<MyHomePage> {
                                     }).toList(),
                                   ),
                                 ),
+                                ((dropdownValue == "Two-Way") ||
+                                        (dropdownValue == "1->2, 3->1"))
+                                    ? Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          getTopPaddingWidget(
+                                              widget: TextField(
+                                                  controller:
+                                                      _secondTransactionParticularsController,
+                                                  enabled:
+                                                      _isNotProcessingTransaction,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    labelText:
+                                                        'Second Transaction Particulars',
+                                                  ))),
+                                          getTopPaddingWidget(
+                                              widget: TextField(
+                                                  controller:
+                                                      _secondTransactionAmountController,
+                                                  enabled:
+                                                      _isNotProcessingTransaction,
+                                                  keyboardType:
+                                                      const TextInputType
+                                                              .numberWithOptions(
+                                                          decimal: true),
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    labelText:
+                                                        'Second Transaction Amount',
+                                                  )))
+                                        ],
+                                      )
+                                    : Container(),
+                                (dropdownValue == "1->2, 3->1")
+                                    ? getTopPaddingWidget(
+                                        widget: TextField(
+                                            controller:
+                                                _thirdAccountIDController,
+                                            keyboardType: TextInputType.number,
+                                            enabled:
+                                                _isNotProcessingTransaction,
+                                            decoration: const InputDecoration(
+                                              border: OutlineInputBorder(),
+                                              labelText: 'Third Account ID',
+                                            )))
+                                    : Container(),
                                 getFullWidthOutlinedButton(
                                   text: 'Skip Transaction',
-                                  onPressed: () {
-                                    setState(() {
-                                      jumpToNextTransaction();
-                                    });
-                                  },
+                                  onPressed: _isNotProcessingTransaction
+                                      ? () {
+                                          setState(() {
+                                            jumpToNextTransaction();
+                                          });
+                                        }
+                                      : null,
                                 ),
-                                getFullWidthOutlinedButton(
-                                  padding: const EdgeInsets.only(
-                                    top: 16.0,
-                                    bottom: 16.0,
-                                  ),
-                                  text: 'Submit Transaction',
-                                  onPressed: () {
-                                    setState(() {
-                                      //TODO : Submit Transaction to server
-                                      jumpToNextTransaction();
-                                    });
-                                  },
-                                ),
+                                _isNotProcessingTransaction
+                                    ? getFullWidthOutlinedButton(
+                                        text: 'Submit Transaction',
+                                        onPressed: _isNotProcessingTransaction
+                                            ? () {
+                                                if (_secondAccountIDController
+                                                    .text.isEmpty) {
+                                                  MotionToast.error(
+                                                    title: const Text(
+                                                      'Error',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    description: const Text(
+                                                        'Please enter second account id'),
+                                                    position:
+                                                        MotionToastPosition.top,
+                                                    barrierColor: Colors.black
+                                                        .withOpacity(0.3),
+                                                    width: 300,
+                                                    height: 80,
+                                                    dismissable: false,
+                                                  ).show(context);
+                                                } else if (_secondTransactionParticularsController
+                                                    .text.isEmpty) {
+                                                  MotionToast.error(
+                                                    title: const Text(
+                                                      'Error',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    description: const Text(
+                                                        'Please enter second transaction particulars'),
+                                                    position:
+                                                        MotionToastPosition.top,
+                                                    barrierColor: Colors.black
+                                                        .withOpacity(0.3),
+                                                    width: 300,
+                                                    height: 80,
+                                                    dismissable: false,
+                                                  ).show(context);
+                                                } else if (_secondTransactionAmountController
+                                                    .text.isEmpty) {
+                                                  MotionToast.error(
+                                                    title: const Text(
+                                                      'Error',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    description: const Text(
+                                                        'Please enter second transaction amount'),
+                                                    position:
+                                                        MotionToastPosition.top,
+                                                    barrierColor: Colors.black
+                                                        .withOpacity(0.3),
+                                                    width: 300,
+                                                    height: 80,
+                                                    dismissable: false,
+                                                  ).show(context);
+                                                } else if ((dropdownValue ==
+                                                        "1->2, 3->1") &&
+                                                    (_secondTransactionAmountController
+                                                        .text.isEmpty)) {
+                                                  MotionToast.error(
+                                                    title: const Text(
+                                                      'Error',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    description: const Text(
+                                                        'Please enter third account id'),
+                                                    position:
+                                                        MotionToastPosition.top,
+                                                    barrierColor: Colors.black
+                                                        .withOpacity(0.3),
+                                                    width: 300,
+                                                    height: 80,
+                                                    dismissable: false,
+                                                  ).show(context);
+                                                } else {
+                                                  invokeSubmitTransaction();
+                                                }
+                                              }
+                                            : null,
+                                      )
+                                    : const Padding(
+                                        padding: EdgeInsets.only(top: 16.0),
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                _isNotProcessingTransaction
+                                    ? getTopPaddingWidget(
+                                        widget: Text(_apiResult,
+                                            key: const Key('Api result label')),
+                                      )
+                                    : Container(),
                               ],
                             )
                           : getFullWidthOutlinedButton(
@@ -274,8 +443,13 @@ class _MyHomePageState extends State<MyHomePage> {
                               onPressed: () {
                                 setState(() {
                                   _isProcessingData = true;
+                                  updateSecondTransactionControllers();
                                 });
                               }),
+                      SizedBox(
+                        height: 16.0,
+                        child: Container(),
+                      ),
                     ],
                   )
                 : Container(),
@@ -283,6 +457,28 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
+  }
+
+  void updateSecondTransactionControllers() {
+    _secondTransactionParticularsController.text = accountLedgerGistModelV2
+        .accountLedgerPages![_currentAccountIndex]
+        .transactionDatePages![_currentDateIndex]
+        .transactions![_currentTransactionIndex]
+        .transactionParticulars!;
+    _secondTransactionAmountController.text = accountLedgerGistModelV2
+        .accountLedgerPages![_currentAccountIndex]
+        .transactionDatePages![_currentDateIndex]
+        .transactions![_currentTransactionIndex]
+        .transactionAmount
+        .toString();
+  }
+
+  @override
+  void dispose() {
+    _secondAccountIDController.dispose();
+    _secondTransactionParticularsController.dispose();
+    _secondTransactionAmountController.dispose();
+    super.dispose();
   }
 
   void jumpToNextTransaction() {
@@ -302,6 +498,7 @@ class _MyHomePageState extends State<MyHomePage> {
           _currentAccountIndex++;
           _currentDateIndex = 0;
           _currentTransactionIndex = 0;
+
           while (accountLedgerGistModelV2
               .accountLedgerPages![_currentAccountIndex]
               .transactionDatePages![_currentDateIndex]
@@ -330,6 +527,142 @@ class _MyHomePageState extends State<MyHomePage> {
           _isProcessingData = false;
         }
       }
+    }
+    if (_isProcessingData) {
+      updateSecondTransactionControllers();
+    }
+  }
+
+  Future<void> invokeSubmitTransaction() async {
+    setState(() {
+      _isNotProcessingTransaction = false;
+    });
+
+    // await sleep(10);
+    AccountLedgerApiResultMessageModal accountLedgerApiResultMessage;
+    if (dropdownValue == "Two-Way") {
+      accountLedgerApiResultMessage =
+          await runAccountLedgerInsertTwoWayTransactionOperationAsync(
+              TransactionModal(
+                  u32(accountLedgerGistModelV2.userId!),
+                  "${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactionDate} $_currentEventTime",
+                  accountLedgerGistModelV2
+                      .accountLedgerPages![_currentAccountIndex]
+                      .transactionDatePages![_currentDateIndex]
+                      .transactions![_currentTransactionIndex]
+                      .transactionParticulars!,
+                  accountLedgerGistModelV2
+                      .accountLedgerPages![_currentAccountIndex]
+                      .transactionDatePages![_currentDateIndex]
+                      .transactions![_currentTransactionIndex]
+                      .transactionAmount!,
+                  accountLedgerGistModelV2
+                          .accountLedgerPages![_currentAccountIndex]
+                          .transactionDatePages![_currentDateIndex]
+                          .transactions![_currentTransactionIndex]
+                          .transactionAmount!
+                          .isNegative
+                      ? u32(accountLedgerGistModelV2
+                          .accountLedgerPages![_currentAccountIndex].accountId!)
+                      : u32.parse(_secondAccountIDController.text),
+                  accountLedgerGistModelV2
+                          .accountLedgerPages![_currentAccountIndex]
+                          .transactionDatePages![_currentDateIndex]
+                          .transactions![_currentTransactionIndex]
+                          .transactionAmount!
+                          .isNegative
+                      ? u32.parse(_secondAccountIDController.text)
+                      : u32(accountLedgerGistModelV2
+                          .accountLedgerPages![_currentAccountIndex]
+                          .accountId!)),
+              _secondTransactionParticularsController.text,
+              double.parse(_secondTransactionAmountController.text));
+    } else if (dropdownValue == "1->2, 3->1") {
+      accountLedgerApiResultMessage =
+          await runAccountLedgerInsertOneTwoThreeOneTransactionOperationAsync(
+              TransactionModal(
+                  u32(accountLedgerGistModelV2.userId!),
+                  "${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactionDate} $_currentEventTime",
+                  accountLedgerGistModelV2
+                      .accountLedgerPages![_currentAccountIndex]
+                      .transactionDatePages![_currentDateIndex]
+                      .transactions![_currentTransactionIndex]
+                      .transactionParticulars!,
+                  accountLedgerGistModelV2
+                      .accountLedgerPages![_currentAccountIndex]
+                      .transactionDatePages![_currentDateIndex]
+                      .transactions![_currentTransactionIndex]
+                      .transactionAmount!,
+                  accountLedgerGistModelV2
+                          .accountLedgerPages![_currentAccountIndex]
+                          .transactionDatePages![_currentDateIndex]
+                          .transactions![_currentTransactionIndex]
+                          .transactionAmount!
+                          .isNegative
+                      ? u32(accountLedgerGistModelV2
+                          .accountLedgerPages![_currentAccountIndex].accountId!)
+                      : u32.parse(_secondAccountIDController.text),
+                  accountLedgerGistModelV2
+                          .accountLedgerPages![_currentAccountIndex]
+                          .transactionDatePages![_currentDateIndex]
+                          .transactions![_currentTransactionIndex]
+                          .transactionAmount!
+                          .isNegative
+                      ? u32.parse(_secondAccountIDController.text)
+                      : u32(accountLedgerGistModelV2
+                          .accountLedgerPages![_currentAccountIndex]
+                          .accountId!)),
+              u32.parse(_thirdAccountIDController.text),
+              _secondTransactionParticularsController.text,
+              double.parse(_secondTransactionAmountController.text));
+    } else {
+      // dropdownValue == "Normal"
+      accountLedgerApiResultMessage =
+          await runAccountLedgerInsertTransactionOperationAsync(TransactionModal(
+              u32(accountLedgerGistModelV2.userId!),
+              "${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactionDate} $_currentEventTime",
+              accountLedgerGistModelV2
+                  .accountLedgerPages![_currentAccountIndex]
+                  .transactionDatePages![_currentDateIndex]
+                  .transactions![_currentTransactionIndex]
+                  .transactionParticulars!,
+              accountLedgerGistModelV2
+                  .accountLedgerPages![_currentAccountIndex]
+                  .transactionDatePages![_currentDateIndex]
+                  .transactions![_currentTransactionIndex]
+                  .transactionAmount!,
+              accountLedgerGistModelV2
+                      .accountLedgerPages![_currentAccountIndex]
+                      .transactionDatePages![_currentDateIndex]
+                      .transactions![_currentTransactionIndex]
+                      .transactionAmount!
+                      .isNegative
+                  ? u32(accountLedgerGistModelV2
+                      .accountLedgerPages![_currentAccountIndex].accountId!)
+                  : u32.parse(_secondAccountIDController.text),
+              accountLedgerGistModelV2
+                      .accountLedgerPages![_currentAccountIndex]
+                      .transactionDatePages![_currentDateIndex]
+                      .transactions![_currentTransactionIndex]
+                      .transactionAmount!
+                      .isNegative
+                  ? u32.parse(_secondAccountIDController.text)
+                  : u32(accountLedgerGistModelV2
+                      .accountLedgerPages![_currentAccountIndex].accountId!)));
+    }
+    setState(() {
+      _isNotProcessingTransaction = true;
+      _apiResult =
+          'API Result : ${jsonEncode(accountLedgerApiResultMessage.accountLedgerApiResultStatus)}';
+    });
+    if (accountLedgerApiResultMessage.accountLedgerApiResultStatus!.status ==
+        0) {
+      setState(() {
+        _secondAccountIDController.clear();
+        _currentEventTime = normalTimeFormat.format(normalDateTimeFormat
+            .parse(accountLedgerApiResultMessage.newDateTime!));
+        jumpToNextTransaction();
+      });
     }
   }
 }
