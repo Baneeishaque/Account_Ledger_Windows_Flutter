@@ -60,6 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
     "Two-Way",
     "1->2, 3->1",
     "1->2, 2->3 (Via.)",
+    "1->2, 2->3, 3->4",
     "1->2, 2->3, 3->4, 4->1"
   ];
   String dropdownValue = list.first;
@@ -305,6 +306,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         (dropdownValue == "1->2, 3->1") ||
                                         (dropdownValue ==
                                             "1->2, 2->3 (Via.)") ||
+                                        (dropdownValue == "1->2, 2->3, 3->4") ||
                                         (dropdownValue ==
                                             "1->2, 2->3, 3->4, 4->1"))
                                     ? Column(
@@ -347,6 +349,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 ((dropdownValue == "1->2, 3->1") ||
                                         (dropdownValue ==
                                             "1->2, 2->3 (Via.)") ||
+                                        (dropdownValue == "1->2, 2->3, 3->4") ||
                                         (dropdownValue ==
                                             "1->2, 2->3, 3->4, 4->1"))
                                     ? getTopPaddingWidget(
@@ -361,7 +364,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                               labelText: 'Third Account ID',
                                             )))
                                     : Container(),
-                                (dropdownValue == "1->2, 2->3, 3->4, 4->1")
+                                ((dropdownValue == "1->2, 2->3, 3->4") ||
+                                        (dropdownValue ==
+                                            "1->2, 2->3, 3->4, 4->1"))
                                     ? Column(
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
@@ -399,7 +404,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                         ],
                                       )
                                     : Container(),
-                                (dropdownValue == "1->2, 2->3, 3->4, 4->1")
+                                ((dropdownValue == "1->2, 2->3, 3->4") ||
+                                        (dropdownValue ==
+                                            "1->2, 2->3, 3->4, 4->1"))
                                     ? getTopPaddingWidget(
                                         widget: TextField(
                                             controller:
@@ -491,6 +498,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                                         (dropdownValue ==
                                                             "1->2, 2->3 (Via.)") ||
                                                         (dropdownValue ==
+                                                            "1->2, 2->3, 3->4") ||
+                                                        (dropdownValue ==
                                                             "1->2, 2->3, 3->4, 4->1")) &&
                                                     (_secondTransactionParticularsController
                                                         .text.isEmpty)) {
@@ -518,6 +527,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                                         (dropdownValue ==
                                                             "1->2, 2->3 (Via.)") ||
                                                         (dropdownValue ==
+                                                            "1->2, 2->3, 3->4") ||
+                                                        (dropdownValue ==
                                                             "1->2, 2->3, 3->4, 4->1")) &&
                                                     (_secondTransactionAmountController
                                                         .text.isEmpty)) {
@@ -541,9 +552,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                                   ).show(context);
                                                 } else if (((dropdownValue == "1->2, 3->1") ||
                                                         (dropdownValue ==
-                                                            "1->2, 3->1") ||
-                                                        (dropdownValue ==
                                                             "1->2, 2->3 (Via.)") ||
+                                                        (dropdownValue ==
+                                                            "1->2, 2->3, 3->4") ||
                                                         (dropdownValue ==
                                                             "1->2, 2->3, 3->4, 4->1")) &&
                                                     (_thirdAccountIdController
@@ -566,9 +577,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                                     height: 80,
                                                     dismissable: false,
                                                   ).show(context);
-                                                } else if ((dropdownValue == "1->2, 2->3, 3->4, 4->1") &&
-                                                    (_thirdTransactionParticularsController
-                                                        .text.isEmpty)) {
+                                                } else if (((dropdownValue == "1->2, 2->3, 3->4") ||
+                                                        (dropdownValue == "1->2, 2->3, 3->4, 4->1")) &&
+                                                    (_thirdTransactionParticularsController.text.isEmpty)) {
                                                   MotionToast.error(
                                                     title: const Text(
                                                       'Error',
@@ -587,9 +598,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                     height: 80,
                                                     dismissable: false,
                                                   ).show(context);
-                                                } else if ((dropdownValue == "1->2, 2->3, 3->4, 4->1") &&
-                                                    (_thirdTransactionAmountController
-                                                        .text.isEmpty)) {
+                                                } else if (((dropdownValue == "1->2, 2->3, 3->4") || (dropdownValue == "1->2, 2->3, 3->4, 4->1")) && (_thirdTransactionAmountController.text.isEmpty)) {
                                                   MotionToast.error(
                                                     title: const Text(
                                                       'Error',
@@ -608,9 +617,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                     height: 80,
                                                     dismissable: false,
                                                   ).show(context);
-                                                } else if ((dropdownValue == "1->2, 2->3, 3->4, 4->1") &&
-                                                    (_fourthAccountIdController
-                                                        .text.isEmpty)) {
+                                                } else if (((dropdownValue == "1->2, 2->3, 3->4") || (dropdownValue == "1->2, 2->3, 3->4, 4->1")) && (_fourthAccountIdController.text.isEmpty)) {
                                                   MotionToast.error(
                                                     title: const Text(
                                                       'Error',
@@ -629,10 +636,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                     height: 80,
                                                     dismissable: false,
                                                   ).show(context);
-                                                } else if ((dropdownValue ==
-                                                        "1->2, 2->3, 3->4, 4->1") &&
-                                                    (_fourthTransactionParticularsController
-                                                        .text.isEmpty)) {
+                                                } else if ((dropdownValue == "1->2, 2->3, 3->4, 4->1") && (_fourthTransactionParticularsController.text.isEmpty)) {
                                                   MotionToast.error(
                                                     title: const Text(
                                                       'Error',
@@ -651,9 +655,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                     height: 80,
                                                     dismissable: false,
                                                   ).show(context);
-                                                } else if ((dropdownValue ==
-                                                        "1->2, 2->3, 3->4, 4->1") &&
-                                                    (_fourthTransactionAmountController.text.isEmpty)) {
+                                                } else if ((dropdownValue == "1->2, 2->3, 3->4, 4->1") && (_fourthTransactionAmountController.text.isEmpty)) {
                                                   MotionToast.error(
                                                     title: const Text(
                                                       'Error',
@@ -856,7 +858,9 @@ class _MyHomePageState extends State<MyHomePage> {
                           .accountLedgerPages![_currentAccountIndex]
                           .accountId!)),
               _secondTransactionParticularsController.text,
-              double.parse(_secondTransactionAmountController.text));
+              double.parse(
+                _secondTransactionAmountController.text,
+              ));
     } else if (dropdownValue == "1->2, 3->1") {
       accountLedgerApiResultMessage =
           await runAccountLedgerInsertOneTwoThreeOneTransactionOperationAsync(
@@ -894,7 +898,9 @@ class _MyHomePageState extends State<MyHomePage> {
                           .accountId!)),
               u32.parse(_thirdAccountIdController.text),
               _secondTransactionParticularsController.text,
-              double.parse(_secondTransactionAmountController.text));
+              double.parse(
+                _secondTransactionAmountController.text,
+              ));
     } else if (dropdownValue == "1->2, 2->3 (Via.)") {
       accountLedgerApiResultMessage =
           await runAccountLedgerInsertOneTwoTwoThreeTransactionOperationAsync(
@@ -932,7 +938,9 @@ class _MyHomePageState extends State<MyHomePage> {
                           .accountId!)),
               u32.parse(_thirdAccountIdController.text),
               _secondTransactionParticularsController.text,
-              double.parse(_secondTransactionAmountController.text));
+              double.parse(
+                _secondTransactionAmountController.text,
+              ));
     } else if (dropdownValue == "1->2, 2->3, 3->4, 4->1") {
       accountLedgerApiResultMessage =
           await runAccountLedgerInsertOneTwoTwoThreeThreeFourFourOneTransactionOperationAsync(
@@ -975,7 +983,52 @@ class _MyHomePageState extends State<MyHomePage> {
               _thirdTransactionParticularsController.text,
               double.parse(_thirdTransactionAmountController.text),
               _fourthTransactionParticularsController.text,
-              double.parse(_fourthTransactionAmountController.text));
+              double.parse(
+                _fourthTransactionAmountController.text,
+              ));
+    } else if (dropdownValue == "1->2, 2->3, 3->4") {
+      accountLedgerApiResultMessage =
+          await runAccountLedgerInsertOneTwoTwoThreeThreeFourTransactionOperationAsync(
+              TransactionModal(
+                  u32(accountLedgerGistModelV2.userId!),
+                  "${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactionDate} $_currentEventTime",
+                  accountLedgerGistModelV2
+                      .accountLedgerPages![_currentAccountIndex]
+                      .transactionDatePages![_currentDateIndex]
+                      .transactions![_currentTransactionIndex]
+                      .transactionParticulars!,
+                  accountLedgerGistModelV2
+                      .accountLedgerPages![_currentAccountIndex]
+                      .transactionDatePages![_currentDateIndex]
+                      .transactions![_currentTransactionIndex]
+                      .transactionAmount!,
+                  accountLedgerGistModelV2
+                          .accountLedgerPages![_currentAccountIndex]
+                          .transactionDatePages![_currentDateIndex]
+                          .transactions![_currentTransactionIndex]
+                          .transactionAmount!
+                          .isNegative
+                      ? u32(accountLedgerGistModelV2
+                          .accountLedgerPages![_currentAccountIndex].accountId!)
+                      : u32.parse(_secondAccountIdController.text),
+                  accountLedgerGistModelV2
+                          .accountLedgerPages![_currentAccountIndex]
+                          .transactionDatePages![_currentDateIndex]
+                          .transactions![_currentTransactionIndex]
+                          .transactionAmount!
+                          .isNegative
+                      ? u32.parse(_secondAccountIdController.text)
+                      : u32(accountLedgerGistModelV2
+                          .accountLedgerPages![_currentAccountIndex]
+                          .accountId!)),
+              u32.parse(_thirdAccountIdController.text),
+              u32.parse(_fourthAccountIdController.text),
+              _secondTransactionParticularsController.text,
+              double.parse(_secondTransactionAmountController.text),
+              _thirdTransactionParticularsController.text,
+              double.parse(
+                _thirdTransactionAmountController.text,
+              ));
     } else {
       // dropdownValue == "Normal"
       accountLedgerApiResultMessage =
