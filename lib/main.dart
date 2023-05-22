@@ -4,6 +4,7 @@ import 'package:account_ledger_library_dart/account_ledger_api_result_message_mo
 import 'package:account_ledger_library_dart/date_time_utils.dart';
 import 'package:account_ledger_library_dart/transaction_modal.dart';
 import 'package:account_ledger_library_dart/transaction_utils_api.dart';
+import 'package:audio_in_app/audio_in_app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:integer/integer.dart';
@@ -52,21 +53,27 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _isProcessingData = false;
   int _currentAccountIndex = 0;
   int _currentDateIndex = 0;
-  String _currentEventTime = "09:05:00";
+  String _currentEventTime = "11:05:00";
   int _currentTransactionIndex = 0;
   static const List<String> list = <String>[
-    'Normal',
-    'Two-Way',
-    '1->2, 3->1',
-    '1->2, 2->3 (Via.)',
+    "Normal",
+    "Two-Way",
+    "1->2, 3->1",
+    "1->2, 2->3 (Via.)",
+    "1->2, 2->3, 3->4, 4->1"
   ];
   String dropdownValue = list.first;
   bool _isNotProcessingTransaction = true;
-  late TextEditingController _secondAccountIDController;
+  late TextEditingController _secondAccountIdController;
   late TextEditingController _secondTransactionParticularsController;
   late TextEditingController _secondTransactionAmountController;
   String _apiResult = 'API Result : N/A';
-  late TextEditingController _thirdAccountIDController;
+  late TextEditingController _thirdAccountIdController;
+  late TextEditingController _thirdTransactionParticularsController;
+  late TextEditingController _thirdTransactionAmountController;
+  late TextEditingController _fourthAccountIdController;
+  late TextEditingController _fourthTransactionParticularsController;
+  late TextEditingController _fourthTransactionAmountController;
 
   Widget getFullWidthOutlinedButton({
     required String text,
@@ -120,13 +127,31 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  final AudioInApp _audioInApp = AudioInApp();
+
   @override
   void initState() {
     super.initState();
-    _secondAccountIDController = TextEditingController();
+    _secondAccountIdController = TextEditingController();
     _secondTransactionParticularsController = TextEditingController();
     _secondTransactionAmountController = TextEditingController();
-    _thirdAccountIDController = TextEditingController();
+    _thirdAccountIdController = TextEditingController();
+    _thirdTransactionParticularsController = TextEditingController();
+    _thirdTransactionAmountController = TextEditingController();
+    _fourthAccountIdController = TextEditingController();
+    _fourthTransactionParticularsController = TextEditingController();
+    _fourthTransactionAmountController = TextEditingController();
+    Future.delayed(const Duration(milliseconds: 1500))
+        .then((value) => initializeAudio());
+  }
+
+  Future<bool> initializeAudio() async => await _audioInApp.createNewAudioCache(
+      playerId: 'button',
+      route: 'button.wav',
+      audioInAppType: AudioInAppType.determined);
+
+  Future<void> playButton() async {
+    await _audioInApp.play(playerId: 'button');
   }
 
   @override
@@ -245,7 +270,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                       bottom: 16.0,
                                     ),
                                     widget: TextField(
-                                        controller: _secondAccountIDController,
+                                        controller: _secondAccountIdController,
                                         enabled: _isNotProcessingTransaction,
                                         keyboardType: TextInputType.number,
                                         decoration: const InputDecoration(
@@ -278,7 +303,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                 ),
                                 ((dropdownValue == "Two-Way") ||
                                         (dropdownValue == "1->2, 3->1") ||
-                                        (dropdownValue == "1->2, 2->3 (Via.)"))
+                                        (dropdownValue ==
+                                            "1->2, 2->3 (Via.)") ||
+                                        (dropdownValue ==
+                                            "1->2, 2->3, 3->4, 4->1"))
                                     ? Column(
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
@@ -317,11 +345,14 @@ class _MyHomePageState extends State<MyHomePage> {
                                       )
                                     : Container(),
                                 ((dropdownValue == "1->2, 3->1") ||
-                                        (dropdownValue == "1->2, 2->3 (Via.)"))
+                                        (dropdownValue ==
+                                            "1->2, 2->3 (Via.)") ||
+                                        (dropdownValue ==
+                                            "1->2, 2->3, 3->4, 4->1"))
                                     ? getTopPaddingWidget(
                                         widget: TextField(
                                             controller:
-                                                _thirdAccountIDController,
+                                                _thirdAccountIdController,
                                             keyboardType: TextInputType.number,
                                             enabled:
                                                 _isNotProcessingTransaction,
@@ -329,6 +360,95 @@ class _MyHomePageState extends State<MyHomePage> {
                                               border: OutlineInputBorder(),
                                               labelText: 'Third Account ID',
                                             )))
+                                    : Container(),
+                                (dropdownValue == "1->2, 2->3, 3->4, 4->1")
+                                    ? Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          getTopPaddingWidget(
+                                              widget: TextField(
+                                                  controller:
+                                                      _thirdTransactionParticularsController,
+                                                  enabled:
+                                                      _isNotProcessingTransaction,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    labelText:
+                                                        'Third Transaction Particulars',
+                                                  ))),
+                                          getTopPaddingWidget(
+                                              widget: TextField(
+                                                  controller:
+                                                      _thirdTransactionAmountController,
+                                                  enabled:
+                                                      _isNotProcessingTransaction,
+                                                  keyboardType:
+                                                      const TextInputType
+                                                              .numberWithOptions(
+                                                          decimal: true),
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    labelText:
+                                                        'Third Transaction Amount',
+                                                  )))
+                                        ],
+                                      )
+                                    : Container(),
+                                (dropdownValue == "1->2, 2->3, 3->4, 4->1")
+                                    ? getTopPaddingWidget(
+                                        widget: TextField(
+                                            controller:
+                                                _fourthAccountIdController,
+                                            keyboardType: TextInputType.number,
+                                            enabled:
+                                                _isNotProcessingTransaction,
+                                            decoration: const InputDecoration(
+                                              border: OutlineInputBorder(),
+                                              labelText: 'Fourth Account ID',
+                                            )))
+                                    : Container(),
+                                (dropdownValue == "1->2, 2->3, 3->4, 4->1")
+                                    ? Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          getTopPaddingWidget(
+                                              widget: TextField(
+                                                  controller:
+                                                      _fourthTransactionParticularsController,
+                                                  enabled:
+                                                      _isNotProcessingTransaction,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    labelText:
+                                                        'Fourth Transaction Particulars',
+                                                  ))),
+                                          getTopPaddingWidget(
+                                              widget: TextField(
+                                                  controller:
+                                                      _fourthTransactionAmountController,
+                                                  enabled:
+                                                      _isNotProcessingTransaction,
+                                                  keyboardType:
+                                                      const TextInputType
+                                                              .numberWithOptions(
+                                                          decimal: true),
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    labelText:
+                                                        'Fourth Transaction Amount',
+                                                  )))
+                                        ],
+                                      )
                                     : Container(),
                                 getFullWidthOutlinedButton(
                                   text: 'Skip Transaction',
@@ -345,7 +465,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         text: 'Submit Transaction',
                                         onPressed: _isNotProcessingTransaction
                                             ? () {
-                                                if (_secondAccountIDController
+                                                if (_secondAccountIdController
                                                     .text.isEmpty) {
                                                   MotionToast.error(
                                                     title: const Text(
@@ -365,8 +485,15 @@ class _MyHomePageState extends State<MyHomePage> {
                                                     height: 80,
                                                     dismissable: false,
                                                   ).show(context);
-                                                } else if (_secondTransactionParticularsController
-                                                    .text.isEmpty) {
+                                                } else if (((dropdownValue == "Two-Way") ||
+                                                        (dropdownValue ==
+                                                            "1->2, 3->1") ||
+                                                        (dropdownValue ==
+                                                            "1->2, 2->3 (Via.)") ||
+                                                        (dropdownValue ==
+                                                            "1->2, 2->3, 3->4, 4->1")) &&
+                                                    (_secondTransactionParticularsController
+                                                        .text.isEmpty)) {
                                                   MotionToast.error(
                                                     title: const Text(
                                                       'Error',
@@ -385,8 +512,15 @@ class _MyHomePageState extends State<MyHomePage> {
                                                     height: 80,
                                                     dismissable: false,
                                                   ).show(context);
-                                                } else if (_secondTransactionAmountController
-                                                    .text.isEmpty) {
+                                                } else if (((dropdownValue == "Two-Way") ||
+                                                        (dropdownValue ==
+                                                            "1->2, 3->1") ||
+                                                        (dropdownValue ==
+                                                            "1->2, 2->3 (Via.)") ||
+                                                        (dropdownValue ==
+                                                            "1->2, 2->3, 3->4, 4->1")) &&
+                                                    (_secondTransactionAmountController
+                                                        .text.isEmpty)) {
                                                   MotionToast.error(
                                                     title: const Text(
                                                       'Error',
@@ -405,11 +539,14 @@ class _MyHomePageState extends State<MyHomePage> {
                                                     height: 80,
                                                     dismissable: false,
                                                   ).show(context);
-                                                } else if (((dropdownValue ==
+                                                } else if (((dropdownValue == "Two-Way") ||
+                                                        (dropdownValue ==
                                                             "1->2, 3->1") ||
                                                         (dropdownValue ==
-                                                            "1->2, 2->3 (Via.)")) &&
-                                                    (_secondTransactionAmountController
+                                                            "1->2, 2->3 (Via.)") ||
+                                                        (dropdownValue ==
+                                                            "1->2, 2->3, 3->4, 4->1")) &&
+                                                    (_thirdAccountIdController
                                                         .text.isEmpty)) {
                                                   MotionToast.error(
                                                     title: const Text(
@@ -421,6 +558,112 @@ class _MyHomePageState extends State<MyHomePage> {
                                                     ),
                                                     description: const Text(
                                                         'Please enter third account id'),
+                                                    position:
+                                                        MotionToastPosition.top,
+                                                    barrierColor: Colors.black
+                                                        .withOpacity(0.3),
+                                                    width: 300,
+                                                    height: 80,
+                                                    dismissable: false,
+                                                  ).show(context);
+                                                } else if ((dropdownValue == "1->2, 2->3, 3->4, 4->1") &&
+                                                    (_thirdTransactionParticularsController
+                                                        .text.isEmpty)) {
+                                                  MotionToast.error(
+                                                    title: const Text(
+                                                      'Error',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    description: const Text(
+                                                        'Please enter third transaction particulars'),
+                                                    position:
+                                                        MotionToastPosition.top,
+                                                    barrierColor: Colors.black
+                                                        .withOpacity(0.3),
+                                                    width: 300,
+                                                    height: 80,
+                                                    dismissable: false,
+                                                  ).show(context);
+                                                } else if ((dropdownValue == "1->2, 2->3, 3->4, 4->1") &&
+                                                    (_thirdTransactionAmountController
+                                                        .text.isEmpty)) {
+                                                  MotionToast.error(
+                                                    title: const Text(
+                                                      'Error',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    description: const Text(
+                                                        'Please enter third transaction amount'),
+                                                    position:
+                                                        MotionToastPosition.top,
+                                                    barrierColor: Colors.black
+                                                        .withOpacity(0.3),
+                                                    width: 300,
+                                                    height: 80,
+                                                    dismissable: false,
+                                                  ).show(context);
+                                                } else if ((dropdownValue == "1->2, 2->3, 3->4, 4->1") &&
+                                                    (_fourthAccountIdController
+                                                        .text.isEmpty)) {
+                                                  MotionToast.error(
+                                                    title: const Text(
+                                                      'Error',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    description: const Text(
+                                                        'Please enter fourth account id'),
+                                                    position:
+                                                        MotionToastPosition.top,
+                                                    barrierColor: Colors.black
+                                                        .withOpacity(0.3),
+                                                    width: 300,
+                                                    height: 80,
+                                                    dismissable: false,
+                                                  ).show(context);
+                                                } else if ((dropdownValue ==
+                                                        "1->2, 2->3, 3->4, 4->1") &&
+                                                    (_fourthTransactionParticularsController
+                                                        .text.isEmpty)) {
+                                                  MotionToast.error(
+                                                    title: const Text(
+                                                      'Error',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    description: const Text(
+                                                        'Please enter fourth transaction particulars'),
+                                                    position:
+                                                        MotionToastPosition.top,
+                                                    barrierColor: Colors.black
+                                                        .withOpacity(0.3),
+                                                    width: 300,
+                                                    height: 80,
+                                                    dismissable: false,
+                                                  ).show(context);
+                                                } else if ((dropdownValue ==
+                                                        "1->2, 2->3, 3->4, 4->1") &&
+                                                    (_fourthTransactionAmountController.text.isEmpty)) {
+                                                  MotionToast.error(
+                                                    title: const Text(
+                                                      'Error',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    description: const Text(
+                                                        'Please enter fourth transaction amount'),
                                                     position:
                                                         MotionToastPosition.top,
                                                     barrierColor: Colors.black
@@ -452,7 +695,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               onPressed: () {
                                 setState(() {
                                   _isProcessingData = true;
-                                  updateSecondTransactionControllers();
+                                  updateTransactionControllers();
                                 });
                               }),
                       SizedBox(
@@ -468,7 +711,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void updateSecondTransactionControllers() {
+  void updateTransactionControllers() {
     _secondTransactionParticularsController.text = accountLedgerGistModelV2
         .accountLedgerPages![_currentAccountIndex]
         .transactionDatePages![_currentDateIndex]
@@ -480,13 +723,41 @@ class _MyHomePageState extends State<MyHomePage> {
         .transactions![_currentTransactionIndex]
         .transactionAmount
         .toString();
+    _thirdTransactionParticularsController.text = accountLedgerGistModelV2
+        .accountLedgerPages![_currentAccountIndex]
+        .transactionDatePages![_currentDateIndex]
+        .transactions![_currentTransactionIndex]
+        .transactionParticulars!;
+    _thirdTransactionAmountController.text = accountLedgerGistModelV2
+        .accountLedgerPages![_currentAccountIndex]
+        .transactionDatePages![_currentDateIndex]
+        .transactions![_currentTransactionIndex]
+        .transactionAmount
+        .toString();
+    _fourthTransactionParticularsController.text = accountLedgerGistModelV2
+        .accountLedgerPages![_currentAccountIndex]
+        .transactionDatePages![_currentDateIndex]
+        .transactions![_currentTransactionIndex]
+        .transactionParticulars!;
+    _fourthTransactionAmountController.text = accountLedgerGistModelV2
+        .accountLedgerPages![_currentAccountIndex]
+        .transactionDatePages![_currentDateIndex]
+        .transactions![_currentTransactionIndex]
+        .transactionAmount
+        .toString();
   }
 
   @override
   void dispose() {
-    _secondAccountIDController.dispose();
+    _secondAccountIdController.dispose();
     _secondTransactionParticularsController.dispose();
     _secondTransactionAmountController.dispose();
+    _thirdAccountIdController.dispose();
+    _thirdTransactionParticularsController.dispose();
+    _thirdTransactionAmountController.dispose();
+    _fourthAccountIdController.dispose();
+    _fourthTransactionParticularsController.dispose();
+    _fourthTransactionAmountController.dispose();
     super.dispose();
   }
 
@@ -538,7 +809,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     }
     if (_isProcessingData) {
-      updateSecondTransactionControllers();
+      updateTransactionControllers();
     }
   }
 
@@ -573,14 +844,14 @@ class _MyHomePageState extends State<MyHomePage> {
                           .isNegative
                       ? u32(accountLedgerGistModelV2
                           .accountLedgerPages![_currentAccountIndex].accountId!)
-                      : u32.parse(_secondAccountIDController.text),
+                      : u32.parse(_secondAccountIdController.text),
                   accountLedgerGistModelV2
                           .accountLedgerPages![_currentAccountIndex]
                           .transactionDatePages![_currentDateIndex]
                           .transactions![_currentTransactionIndex]
                           .transactionAmount!
                           .isNegative
-                      ? u32.parse(_secondAccountIDController.text)
+                      ? u32.parse(_secondAccountIdController.text)
                       : u32(accountLedgerGistModelV2
                           .accountLedgerPages![_currentAccountIndex]
                           .accountId!)),
@@ -610,18 +881,18 @@ class _MyHomePageState extends State<MyHomePage> {
                           .isNegative
                       ? u32(accountLedgerGistModelV2
                           .accountLedgerPages![_currentAccountIndex].accountId!)
-                      : u32.parse(_secondAccountIDController.text),
+                      : u32.parse(_secondAccountIdController.text),
                   accountLedgerGistModelV2
                           .accountLedgerPages![_currentAccountIndex]
                           .transactionDatePages![_currentDateIndex]
                           .transactions![_currentTransactionIndex]
                           .transactionAmount!
                           .isNegative
-                      ? u32.parse(_secondAccountIDController.text)
+                      ? u32.parse(_secondAccountIdController.text)
                       : u32(accountLedgerGistModelV2
                           .accountLedgerPages![_currentAccountIndex]
                           .accountId!)),
-              u32.parse(_thirdAccountIDController.text),
+              u32.parse(_thirdAccountIdController.text),
               _secondTransactionParticularsController.text,
               double.parse(_secondTransactionAmountController.text));
     } else if (dropdownValue == "1->2, 2->3 (Via.)") {
@@ -648,20 +919,63 @@ class _MyHomePageState extends State<MyHomePage> {
                           .isNegative
                       ? u32(accountLedgerGistModelV2
                           .accountLedgerPages![_currentAccountIndex].accountId!)
-                      : u32.parse(_secondAccountIDController.text),
+                      : u32.parse(_secondAccountIdController.text),
                   accountLedgerGistModelV2
                           .accountLedgerPages![_currentAccountIndex]
                           .transactionDatePages![_currentDateIndex]
                           .transactions![_currentTransactionIndex]
                           .transactionAmount!
                           .isNegative
-                      ? u32.parse(_secondAccountIDController.text)
+                      ? u32.parse(_secondAccountIdController.text)
                       : u32(accountLedgerGistModelV2
                           .accountLedgerPages![_currentAccountIndex]
                           .accountId!)),
-              u32.parse(_thirdAccountIDController.text),
+              u32.parse(_thirdAccountIdController.text),
               _secondTransactionParticularsController.text,
               double.parse(_secondTransactionAmountController.text));
+    } else if (dropdownValue == "1->2, 2->3, 3->4, 4->1") {
+      accountLedgerApiResultMessage =
+          await runAccountLedgerInsertOneTwoTwoThreeThreeFourFourOneTransactionOperationAsync(
+              TransactionModal(
+                  u32(accountLedgerGistModelV2.userId!),
+                  "${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactionDate} $_currentEventTime",
+                  accountLedgerGistModelV2
+                      .accountLedgerPages![_currentAccountIndex]
+                      .transactionDatePages![_currentDateIndex]
+                      .transactions![_currentTransactionIndex]
+                      .transactionParticulars!,
+                  accountLedgerGistModelV2
+                      .accountLedgerPages![_currentAccountIndex]
+                      .transactionDatePages![_currentDateIndex]
+                      .transactions![_currentTransactionIndex]
+                      .transactionAmount!,
+                  accountLedgerGistModelV2
+                          .accountLedgerPages![_currentAccountIndex]
+                          .transactionDatePages![_currentDateIndex]
+                          .transactions![_currentTransactionIndex]
+                          .transactionAmount!
+                          .isNegative
+                      ? u32(accountLedgerGistModelV2
+                          .accountLedgerPages![_currentAccountIndex].accountId!)
+                      : u32.parse(_secondAccountIdController.text),
+                  accountLedgerGistModelV2
+                          .accountLedgerPages![_currentAccountIndex]
+                          .transactionDatePages![_currentDateIndex]
+                          .transactions![_currentTransactionIndex]
+                          .transactionAmount!
+                          .isNegative
+                      ? u32.parse(_secondAccountIdController.text)
+                      : u32(accountLedgerGistModelV2
+                          .accountLedgerPages![_currentAccountIndex]
+                          .accountId!)),
+              u32.parse(_thirdAccountIdController.text),
+              u32.parse(_fourthAccountIdController.text),
+              _secondTransactionParticularsController.text,
+              double.parse(_secondTransactionAmountController.text),
+              _thirdTransactionParticularsController.text,
+              double.parse(_thirdTransactionAmountController.text),
+              _fourthTransactionParticularsController.text,
+              double.parse(_fourthTransactionAmountController.text));
     } else {
       // dropdownValue == "Normal"
       accountLedgerApiResultMessage =
@@ -686,14 +1000,14 @@ class _MyHomePageState extends State<MyHomePage> {
                       .isNegative
                   ? u32(accountLedgerGistModelV2
                       .accountLedgerPages![_currentAccountIndex].accountId!)
-                  : u32.parse(_secondAccountIDController.text),
+                  : u32.parse(_secondAccountIdController.text),
               accountLedgerGistModelV2
                       .accountLedgerPages![_currentAccountIndex]
                       .transactionDatePages![_currentDateIndex]
                       .transactions![_currentTransactionIndex]
                       .transactionAmount!
                       .isNegative
-                  ? u32.parse(_secondAccountIDController.text)
+                  ? u32.parse(_secondAccountIdController.text)
                   : u32(accountLedgerGistModelV2
                       .accountLedgerPages![_currentAccountIndex].accountId!)));
     }
@@ -702,10 +1016,13 @@ class _MyHomePageState extends State<MyHomePage> {
       _apiResult =
           'API Result : ${jsonEncode(accountLedgerApiResultMessage.accountLedgerApiResultStatus)}';
     });
+    playButton();
     if (accountLedgerApiResultMessage.accountLedgerApiResultStatus!.status ==
         0) {
       setState(() {
-        _secondAccountIDController.clear();
+        _secondAccountIdController.clear();
+        _thirdAccountIdController.clear();
+        _fourthAccountIdController.clear();
         _currentEventTime = normalTimeFormat.format(normalDateTimeFormat
             .parse(accountLedgerApiResultMessage.newDateTime!));
         jumpToNextTransaction();
