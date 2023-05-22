@@ -85,6 +85,8 @@ class _MyHomePageState extends State<MyHomePage> {
       accountLedgerGistModelV2 =
           AccountLedgerGistModelV2.fromJson(jsonDecode(result!));
       // debugPrint(result);
+      // debugPrint(accountLedgerGistModelV2.toJson().toString());
+      accountLedgerGistModelV2.accountLedgerPages = accountLedgerGistModelV2.accountLedgerPages!.sublist(6);
       debugPrint(accountLedgerGistModelV2.toJson().toString());
       gistData = 'Gist Data: $result';
     } on PlatformException catch (e) {
@@ -137,10 +139,15 @@ class _MyHomePageState extends State<MyHomePage> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 getFullWidthOutlinedButton(
-                                    text: 'Process Gist Data', onPressed: null),
+                                    padding: const EdgeInsets.only(
+                                      top: 16.0,
+                                      bottom: 16.0,
+                                    ),
+                                    text: 'Process Gist Data',
+                                    onPressed: null),
                                 //TODO : Get User ID from Username
                                 getTopPaddingWidget(
-                                  padding: const EdgeInsets.only(top: 8.0),
+                                  padding: EdgeInsets.zero,
                                   widget: Text(
                                     "User : ${accountLedgerGistModelV2.userName!}",
                                     textAlign: TextAlign.start,
@@ -204,6 +211,24 @@ class _MyHomePageState extends State<MyHomePage> {
                                               .length !=
                                           (_currentTransactionIndex + 1)) {
                                         _currentTransactionIndex++;
+                                      } else {
+                                        if (accountLedgerGistModelV2
+                                                .accountLedgerPages![
+                                                    _currentAccountIndex]
+                                                .transactionDatePages!
+                                                .length !=
+                                            (_currentDateIndex + 1)) {
+                                          _currentDateIndex++;
+                                          _currentTransactionIndex = 0;
+                                        } else {
+                                          if (accountLedgerGistModelV2
+                                                  .accountLedgerPages!.length !=
+                                              (_currentAccountIndex + 1)) {
+                                            _currentAccountIndex++;
+                                            _currentDateIndex = 0;
+                                            _currentTransactionIndex = 0;
+                                          }
+                                        }
                                       }
                                     });
                                   },
