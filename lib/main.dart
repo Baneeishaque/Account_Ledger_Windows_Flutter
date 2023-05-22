@@ -539,7 +539,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                     height: 80,
                                                     dismissable: false,
                                                   ).show(context);
-                                                } else if (((dropdownValue == "Two-Way") ||
+                                                } else if (((dropdownValue == "1->2, 3->1") ||
                                                         (dropdownValue ==
                                                             "1->2, 3->1") ||
                                                         (dropdownValue ==
