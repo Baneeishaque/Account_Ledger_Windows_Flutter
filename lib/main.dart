@@ -47,6 +47,8 @@ class _MyHomePageState extends State<MyHomePage> {
   int _currentDateIndex = 0;
   String _currentEventTime = "09:00";
   int _currentTransactionIndex = 0;
+  static const List<String> list = <String>['Normal', 'Two-Way'];
+  String dropdownValue = list.first;
 
   Widget getFullWidthOutlinedButton({
     required String text,
@@ -128,9 +130,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         text: 'Get Gist Data',
                         onPressed: _getGistData,
                       ),
-            getTopPaddingWidget(
-              widget: Text(_gistData, key: const Key('Gist data label')),
-            ),
+            // getTopPaddingWidget(
+            //   widget: Text(_gistData, key: const Key('Gist data label')),
+            // ),
             _isDataLoaded
                 ? Column(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -150,7 +152,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 getTopPaddingWidget(
                                   padding: EdgeInsets.zero,
                                   widget: Text(
-                                    "User : ${accountLedgerGistModelV2.userName!}",
+                                    "User : ${accountLedgerGistModelV2.userName!} [${accountLedgerGistModelV2.userId}]",
                                     textAlign: TextAlign.start,
                                   ),
                                 ),
@@ -163,11 +165,17 @@ class _MyHomePageState extends State<MyHomePage> {
                                   textAlign: TextAlign.start,
                                 ),
                                 Text(
-                                    'Event Date Time : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactionDate} $_currentEventTime'),
+                                  'Event Date Time : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactionDate} $_currentEventTime',
+                                  textAlign: TextAlign.start,
+                                ),
                                 Text(
-                                    'Particulars : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactions![_currentTransactionIndex].transactionParticulars}'),
+                                  'Particulars : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactions![_currentTransactionIndex].transactionParticulars}',
+                                  textAlign: TextAlign.start,
+                                ),
                                 Text(
-                                    'Amount : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactions![_currentTransactionIndex].transactionAmount}'),
+                                  'Amount : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactions![_currentTransactionIndex].transactionAmount}',
+                                  textAlign: TextAlign.start,
+                                ),
                                 accountLedgerGistModelV2
                                         .accountLedgerPages![
                                             _currentAccountIndex]
@@ -181,19 +189,71 @@ class _MyHomePageState extends State<MyHomePage> {
                                             MainAxisAlignment.start,
                                         children: [
                                           Text(
-                                              'From A/C : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].accountId}'),
-                                          const Text('To A/C : '),
+                                            'From A/C : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].accountId}',
+                                            textAlign: TextAlign.start,
+                                          ),
+                                          const Text(
+                                            'To A/C : - ',
+                                            textAlign: TextAlign.start,
+                                          ),
                                         ],
                                       )
                                     : Column(
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
                                         children: [
-                                          const Text('From A/C : '),
+                                          const Text(
+                                            'From A/C : - ',
+                                            textAlign: TextAlign.start,
+                                          ),
                                           Text(
-                                              'To A/C : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].accountId}'),
+                                            'To A/C : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].accountId}',
+                                            textAlign: TextAlign.start,
+                                          ),
                                         ],
                                       ),
+                                getTopPaddingWidget(
+                                    widget: const TextField(
+                                        decoration: InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  labelText: 'Second A/C ID',
+                                ))),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: DropdownButton<String>(
+                                    alignment: Alignment.center,
+                                    // padding: const EdgeInsets.only(
+                                    //   top: 16.0,
+                                    // ),
+                                    value: dropdownValue,
+                                    onChanged: (String? value) {
+                                      // This is called when the user selects an item.
+                                      setState(() {
+                                        dropdownValue = value!;
+                                        debugPrint(dropdownValue);
+                                      });
+                                    },
+                                    items: list.map<DropdownMenuItem<String>>(
+                                        (String value) {
+                                      return DropdownMenuItem<String>(
+                                        alignment: Alignment.center,
+                                        value: value,
+                                        child: Text(
+                                          value,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+                                getFullWidthOutlinedButton(
+                                  text: 'Skip Transaction',
+                                  onPressed: () {
+                                    setState(() {
+                                      jumpToNextTransaction();
+                                    });
+                                  },
+                                ),
                                 getFullWidthOutlinedButton(
                                   padding: const EdgeInsets.only(
                                     top: 16.0,
@@ -203,66 +263,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   onPressed: () {
                                     setState(() {
                                       //TODO : Submit Transaction to server
-                                      if (accountLedgerGistModelV2
-                                              .accountLedgerPages![
-                                                  _currentAccountIndex]
-                                              .transactionDatePages![
-                                                  _currentDateIndex]
-                                              .transactions!
-                                              .length !=
-                                          (_currentTransactionIndex + 1)) {
-                                        _currentTransactionIndex++;
-                                      } else {
-                                        if (accountLedgerGistModelV2
-                                                .accountLedgerPages![
-                                                    _currentAccountIndex]
-                                                .transactionDatePages!
-                                                .length !=
-                                            (_currentDateIndex + 1)) {
-                                          _currentDateIndex++;
-                                          _currentTransactionIndex = 0;
-                                        } else {
-                                          if (accountLedgerGistModelV2
-                                                  .accountLedgerPages!.length !=
-                                              (_currentAccountIndex + 1)) {
-                                            _currentAccountIndex++;
-                                            _currentDateIndex = 0;
-                                            _currentTransactionIndex = 0;
-                                            while (accountLedgerGistModelV2
-                                                .accountLedgerPages![
-                                                    _currentAccountIndex]
-                                                .transactionDatePages![
-                                                    _currentDateIndex]
-                                                .transactions!
-                                                .isEmpty) {
-                                              if (accountLedgerGistModelV2
-                                                      .accountLedgerPages![
-                                                          _currentAccountIndex]
-                                                      .transactionDatePages!
-                                                      .length !=
-                                                  (_currentDateIndex + 1)) {
-                                                _currentDateIndex++;
-                                                _currentTransactionIndex = 0;
-                                              } else {
-                                                if (accountLedgerGistModelV2
-                                                        .accountLedgerPages!
-                                                        .length !=
-                                                    (_currentAccountIndex +
-                                                        1)) {
-                                                  _currentAccountIndex++;
-                                                  _currentDateIndex = 0;
-                                                  _currentTransactionIndex = 0;
-                                                } else {
-                                                  _isProcessingData = false;
-                                                  break;
-                                                }
-                                              }
-                                            }
-                                          } else {
-                                            _isProcessingData = false;
-                                          }
-                                        }
-                                      }
+                                      jumpToNextTransaction();
                                     });
                                   },
                                 ),
@@ -282,5 +283,53 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
+  }
+
+  void jumpToNextTransaction() {
+    if (accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex]
+            .transactionDatePages![_currentDateIndex].transactions!.length !=
+        (_currentTransactionIndex + 1)) {
+      _currentTransactionIndex++;
+    } else {
+      if (accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex]
+              .transactionDatePages!.length !=
+          (_currentDateIndex + 1)) {
+        _currentDateIndex++;
+        _currentTransactionIndex = 0;
+      } else {
+        if (accountLedgerGistModelV2.accountLedgerPages!.length !=
+            (_currentAccountIndex + 1)) {
+          _currentAccountIndex++;
+          _currentDateIndex = 0;
+          _currentTransactionIndex = 0;
+          while (accountLedgerGistModelV2
+              .accountLedgerPages![_currentAccountIndex]
+              .transactionDatePages![_currentDateIndex]
+              .transactions!
+              .isEmpty) {
+            if (accountLedgerGistModelV2
+                    .accountLedgerPages![_currentAccountIndex]
+                    .transactionDatePages!
+                    .length !=
+                (_currentDateIndex + 1)) {
+              _currentDateIndex++;
+              _currentTransactionIndex = 0;
+            } else {
+              if (accountLedgerGistModelV2.accountLedgerPages!.length !=
+                  (_currentAccountIndex + 1)) {
+                _currentAccountIndex++;
+                _currentDateIndex = 0;
+                _currentTransactionIndex = 0;
+              } else {
+                _isProcessingData = false;
+                break;
+              }
+            }
+          }
+        } else {
+          _isProcessingData = false;
+        }
+      }
+    }
   }
 }

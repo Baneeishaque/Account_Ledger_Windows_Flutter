@@ -1,11 +1,17 @@
 class AccountLedgerGistModelV2 {
   String? userName;
+  int? userId;
   List<AccountLedgerPages>? accountLedgerPages;
 
-  AccountLedgerGistModelV2({this.userName, this.accountLedgerPages});
+  AccountLedgerGistModelV2({
+    this.userName,
+    this.userId,
+    this.accountLedgerPages,
+  });
 
   AccountLedgerGistModelV2.fromJson(Map<String, dynamic> json) {
     userName = json['userName'];
+    userId = json['userId'];
     if (json['accountLedgerPages'] != null) {
       accountLedgerPages = <AccountLedgerPages>[];
       json['accountLedgerPages'].forEach((v) {
@@ -17,6 +23,7 @@ class AccountLedgerGistModelV2 {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['userName'] = userName;
+    data['userId'] = userId;
     if (accountLedgerPages != null) {
       data['accountLedgerPages'] =
           accountLedgerPages!.map((v) => v.toJson()).toList();
@@ -60,9 +67,9 @@ class TransactionDatePages {
 
   TransactionDatePages(
       {this.transactionDate,
-        this.initialBalance,
-        this.transactions,
-        this.finalBalance});
+      this.initialBalance,
+      this.transactions,
+      this.finalBalance});
 
   TransactionDatePages.fromJson(Map<String, dynamic> json) {
     transactionDate = json['transactionDate'];
