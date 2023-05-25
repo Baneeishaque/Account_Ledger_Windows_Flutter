@@ -61,7 +61,8 @@ class _MyHomePageState extends State<MyHomePage> {
     "1->2, 3->1",
     "1->2, 2->3 (Via.)",
     "1->2, 2->3, 3->4",
-    "1->2, 2->3, 3->4, 4->1"
+    "1->2, 2->3, 4->1",
+    "1->2, 2->3, 3->4, 4->1",
   ];
   String dropdownValue = list.first;
   bool _isNotProcessingTransaction = true;
@@ -307,6 +308,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         (dropdownValue ==
                                             "1->2, 2->3 (Via.)") ||
                                         (dropdownValue == "1->2, 2->3, 3->4") ||
+                                        (dropdownValue == "1->2, 2->3, 4->1") ||
                                         (dropdownValue ==
                                             "1->2, 2->3, 3->4, 4->1"))
                                     ? Column(
@@ -334,7 +336,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                       _isNotProcessingTransaction,
                                                   keyboardType:
                                                       const TextInputType
-                                                              .numberWithOptions(
+                                                          .numberWithOptions(
                                                           decimal: true),
                                                   decoration:
                                                       const InputDecoration(
@@ -350,6 +352,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         (dropdownValue ==
                                             "1->2, 2->3 (Via.)") ||
                                         (dropdownValue == "1->2, 2->3, 3->4") ||
+                                        (dropdownValue == "1->2, 2->3, 4->1") ||
                                         (dropdownValue ==
                                             "1->2, 2->3, 3->4, 4->1"))
                                     ? getTopPaddingWidget(
@@ -365,6 +368,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                             )))
                                     : Container(),
                                 ((dropdownValue == "1->2, 2->3, 3->4") ||
+                                        (dropdownValue == "1->2, 2->3, 4->1") ||
                                         (dropdownValue ==
                                             "1->2, 2->3, 3->4, 4->1"))
                                     ? Column(
@@ -392,7 +396,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                       _isNotProcessingTransaction,
                                                   keyboardType:
                                                       const TextInputType
-                                                              .numberWithOptions(
+                                                          .numberWithOptions(
                                                           decimal: true),
                                                   decoration:
                                                       const InputDecoration(
@@ -405,6 +409,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                       )
                                     : Container(),
                                 ((dropdownValue == "1->2, 2->3, 3->4") ||
+                                        (dropdownValue == "1->2, 2->3, 4->1") ||
                                         (dropdownValue ==
                                             "1->2, 2->3, 3->4, 4->1"))
                                     ? getTopPaddingWidget(
@@ -445,7 +450,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                       _isNotProcessingTransaction,
                                                   keyboardType:
                                                       const TextInputType
-                                                              .numberWithOptions(
+                                                          .numberWithOptions(
                                                           decimal: true),
                                                   decoration:
                                                       const InputDecoration(
@@ -500,6 +505,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                                         (dropdownValue ==
                                                             "1->2, 2->3, 3->4") ||
                                                         (dropdownValue ==
+                                                            "1->2, 2->3, 4->1") ||
+                                                        (dropdownValue ==
                                                             "1->2, 2->3, 3->4, 4->1")) &&
                                                     (_secondTransactionParticularsController
                                                         .text.isEmpty)) {
@@ -529,6 +536,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                                         (dropdownValue ==
                                                             "1->2, 2->3, 3->4") ||
                                                         (dropdownValue ==
+                                                            "1->2, 2->3, 4->1") ||
+                                                        (dropdownValue ==
                                                             "1->2, 2->3, 3->4, 4->1")) &&
                                                     (_secondTransactionAmountController
                                                         .text.isEmpty)) {
@@ -556,6 +565,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                                         (dropdownValue ==
                                                             "1->2, 2->3, 3->4") ||
                                                         (dropdownValue ==
+                                                            "1->2, 2->3, 4->1") ||
+                                                        (dropdownValue ==
                                                             "1->2, 2->3, 3->4, 4->1")) &&
                                                     (_thirdAccountIdController
                                                         .text.isEmpty)) {
@@ -577,8 +588,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                     height: 80,
                                                     dismissable: false,
                                                   ).show(context);
-                                                } else if (((dropdownValue == "1->2, 2->3, 3->4") ||
-                                                        (dropdownValue == "1->2, 2->3, 3->4, 4->1")) &&
+                                                } else if (((dropdownValue == "1->2, 2->3, 3->4") || (dropdownValue == "1->2, 2->3, 4->1") || (dropdownValue == "1->2, 2->3, 3->4, 4->1")) &&
                                                     (_thirdTransactionParticularsController.text.isEmpty)) {
                                                   MotionToast.error(
                                                     title: const Text(
@@ -598,7 +608,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                     height: 80,
                                                     dismissable: false,
                                                   ).show(context);
-                                                } else if (((dropdownValue == "1->2, 2->3, 3->4") || (dropdownValue == "1->2, 2->3, 3->4, 4->1")) && (_thirdTransactionAmountController.text.isEmpty)) {
+                                                } else if (((dropdownValue == "1->2, 2->3, 3->4") || (dropdownValue == "1->2, 2->3, 4->1") || (dropdownValue == "1->2, 2->3, 3->4, 4->1")) && (_thirdTransactionAmountController.text.isEmpty)) {
                                                   MotionToast.error(
                                                     title: const Text(
                                                       'Error',
@@ -617,7 +627,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                     height: 80,
                                                     dismissable: false,
                                                   ).show(context);
-                                                } else if (((dropdownValue == "1->2, 2->3, 3->4") || (dropdownValue == "1->2, 2->3, 3->4, 4->1")) && (_fourthAccountIdController.text.isEmpty)) {
+                                                } else if (((dropdownValue == "1->2, 2->3, 3->4") || (dropdownValue == "1->2, 2->3, 4->1") || (dropdownValue == "1->2, 2->3, 3->4, 4->1")) && (_fourthAccountIdController.text.isEmpty)) {
                                                   MotionToast.error(
                                                     title: const Text(
                                                       'Error',
@@ -989,6 +999,50 @@ class _MyHomePageState extends State<MyHomePage> {
     } else if (dropdownValue == "1->2, 2->3, 3->4") {
       accountLedgerApiResultMessage =
           await runAccountLedgerInsertOneTwoTwoThreeThreeFourTransactionOperationAsync(
+              TransactionModal(
+                  u32(accountLedgerGistModelV2.userId!),
+                  "${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactionDate} $_currentEventTime",
+                  accountLedgerGistModelV2
+                      .accountLedgerPages![_currentAccountIndex]
+                      .transactionDatePages![_currentDateIndex]
+                      .transactions![_currentTransactionIndex]
+                      .transactionParticulars!,
+                  accountLedgerGistModelV2
+                      .accountLedgerPages![_currentAccountIndex]
+                      .transactionDatePages![_currentDateIndex]
+                      .transactions![_currentTransactionIndex]
+                      .transactionAmount!,
+                  accountLedgerGistModelV2
+                          .accountLedgerPages![_currentAccountIndex]
+                          .transactionDatePages![_currentDateIndex]
+                          .transactions![_currentTransactionIndex]
+                          .transactionAmount!
+                          .isNegative
+                      ? u32(accountLedgerGistModelV2
+                          .accountLedgerPages![_currentAccountIndex].accountId!)
+                      : u32.parse(_secondAccountIdController.text),
+                  accountLedgerGistModelV2
+                          .accountLedgerPages![_currentAccountIndex]
+                          .transactionDatePages![_currentDateIndex]
+                          .transactions![_currentTransactionIndex]
+                          .transactionAmount!
+                          .isNegative
+                      ? u32.parse(_secondAccountIdController.text)
+                      : u32(accountLedgerGistModelV2
+                          .accountLedgerPages![_currentAccountIndex]
+                          .accountId!)),
+              u32.parse(_thirdAccountIdController.text),
+              u32.parse(_fourthAccountIdController.text),
+              _secondTransactionParticularsController.text,
+              double.parse(_secondTransactionAmountController.text),
+              _thirdTransactionParticularsController.text,
+              double.parse(
+                _thirdTransactionAmountController.text,
+              ));
+    }
+    if (dropdownValue == "1->2, 2->3, 4->1") {
+      accountLedgerApiResultMessage =
+          await runAccountLedgerInsertOneTwoTwoThreeFourOneTransactionOperationAsync(
               TransactionModal(
                   u32(accountLedgerGistModelV2.userId!),
                   "${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactionDate} $_currentEventTime",
