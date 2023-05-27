@@ -12,6 +12,7 @@ import 'package:motion_toast/motion_toast.dart';
 import 'package:motion_toast/resources/arrays.dart';
 
 import 'account_ledger_gist_model_v2.dart';
+import 'widget_helpers.dart';
 
 void main() {
   runApp(const MyApp());
@@ -76,32 +77,10 @@ class _MyHomePageState extends State<MyHomePage> {
   late TextEditingController _fourthAccountIdController;
   late TextEditingController _fourthTransactionParticularsController;
   late TextEditingController _fourthTransactionAmountController;
-
-  Widget getFullWidthOutlinedButton({
-    required String text,
-    required VoidCallback? onPressed,
-    EdgeInsets padding = const EdgeInsets.only(top: 16.0),
-  }) {
-    return SizedBox(
-      width: double.infinity,
-      child: Padding(
-        padding: padding,
-        child: OutlinedButton(
-          onPressed: onPressed,
-          child: Text(text),
-        ),
-      ),
-    );
-  }
-
-  Widget getTopPaddingWidget(
-      {required Widget widget,
-      EdgeInsets padding = const EdgeInsets.only(top: 16.0)}) {
-    return Padding(
-      padding: padding,
-      child: widget,
-    );
-  }
+  late TextEditingController _firstAccountIdController;
+  late TextEditingController _firstTransactionDateTimeController;
+  late TextEditingController _firstTransactionParticularsController;
+  late TextEditingController _firstTransactionAmountController;
 
   Future<void> _getGistData() async {
     setState(() {
@@ -143,6 +122,10 @@ class _MyHomePageState extends State<MyHomePage> {
     _fourthAccountIdController = TextEditingController();
     _fourthTransactionParticularsController = TextEditingController();
     _fourthTransactionAmountController = TextEditingController();
+    _firstAccountIdController = TextEditingController();
+    _firstTransactionDateTimeController = TextEditingController();
+    _firstTransactionParticularsController = TextEditingController();
+    _firstTransactionAmountController = TextEditingController();
     Future.delayed(const Duration(milliseconds: 1500))
         .then((value) => initializeAudio());
   }
@@ -210,62 +193,95 @@ class _MyHomePageState extends State<MyHomePage> {
                                     textAlign: TextAlign.start,
                                   ),
                                 ),
-                                Text(
-                                  'Account ID : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].accountId}',
-                                  textAlign: TextAlign.start,
-                                ),
+                                TextField(
+                                    controller: _firstAccountIdController,
+                                    enabled: _isNotProcessingTransaction,
+                                    keyboardType: TextInputType.number,
+                                    decoration: const InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      labelText: 'First Account ID',
+                                    )),
+                                // Text(
+                                //   'Account ID : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].accountId}',
+                                //   textAlign: TextAlign.start,
+                                // ),
                                 const Text(
                                   'Current Transaction',
                                   textAlign: TextAlign.start,
                                 ),
-                                Text(
-                                  'Event Date Time : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactionDate} $_currentEventTime',
-                                  textAlign: TextAlign.start,
-                                ),
-                                Text(
-                                  'Particulars : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactions![_currentTransactionIndex].transactionParticulars}',
-                                  textAlign: TextAlign.start,
-                                ),
-                                Text(
-                                  'Amount : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactions![_currentTransactionIndex].transactionAmount}',
-                                  textAlign: TextAlign.start,
-                                ),
-                                accountLedgerGistModelV2
-                                        .accountLedgerPages![
-                                            _currentAccountIndex]
-                                        .transactionDatePages![
-                                            _currentDateIndex]
-                                        .transactions![_currentTransactionIndex]
-                                        .transactionAmount!
-                                        .isNegative
-                                    ? Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'From A/C : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].accountId}',
-                                            textAlign: TextAlign.start,
-                                          ),
-                                          const Text(
-                                            'To A/C : - ',
-                                            textAlign: TextAlign.start,
-                                          ),
-                                        ],
-                                      )
-                                    : Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          const Text(
-                                            'From A/C : - ',
-                                            textAlign: TextAlign.start,
-                                          ),
-                                          Text(
-                                            'To A/C : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].accountId}',
-                                            textAlign: TextAlign.start,
-                                          ),
-                                        ],
-                                      ),
+                                TextField(
+                                    controller:
+                                        _firstTransactionDateTimeController,
+                                    enabled: _isNotProcessingTransaction,
+                                    decoration: const InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      labelText: 'Event Date Time',
+                                    )),
+                                // Text(
+                                //   'Event Date Time : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactionDate} $_currentEventTime',
+                                //   textAlign: TextAlign.start,
+                                // ),
+                                TextField(
+                                    controller:
+                                        _firstTransactionParticularsController,
+                                    enabled: _isNotProcessingTransaction,
+                                    decoration: const InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      labelText:
+                                          'First Transaction Particulars',
+                                    )),
+                                // Text(
+                                //   'Particulars : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactions![_currentTransactionIndex].transactionParticulars}',
+                                //   textAlign: TextAlign.start,
+                                // ),
+                                TextField(
+                                    controller:
+                                        _firstTransactionAmountController,
+                                    enabled: _isNotProcessingTransaction,
+                                    decoration: const InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      labelText: 'First Transaction Amount',
+                                    )),
+                                // Text(
+                                //   'Amount : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactions![_currentTransactionIndex].transactionAmount}',
+                                //   textAlign: TextAlign.start,
+                                // ),
+                                // accountLedgerGistModelV2
+                                //         .accountLedgerPages![
+                                //             _currentAccountIndex]
+                                //         .transactionDatePages![
+                                //             _currentDateIndex]
+                                //         .transactions![_currentTransactionIndex]
+                                //         .transactionAmount!
+                                //         .isNegative
+                                //     ? Column(
+                                //         mainAxisAlignment:
+                                //             MainAxisAlignment.start,
+                                //         children: [
+                                //           Text(
+                                //             'From A/C : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].accountId}',
+                                //             textAlign: TextAlign.start,
+                                //           ),
+                                //           const Text(
+                                //             'To A/C : - ',
+                                //             textAlign: TextAlign.start,
+                                //           ),
+                                //         ],
+                                //       )
+                                //     : Column(
+                                //         mainAxisAlignment:
+                                //             MainAxisAlignment.start,
+                                //         children: [
+                                //           const Text(
+                                //             'From A/C : - ',
+                                //             textAlign: TextAlign.start,
+                                //           ),
+                                //           Text(
+                                //             'To A/C : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].accountId}',
+                                //             textAlign: TextAlign.start,
+                                //           ),
+                                //         ],
+                                //       ),
                                 getTopPaddingWidget(
                                     padding: const EdgeInsets.only(
                                       top: 16.0,
@@ -477,7 +493,87 @@ class _MyHomePageState extends State<MyHomePage> {
                                         text: 'Submit Transaction',
                                         onPressed: _isNotProcessingTransaction
                                             ? () {
-                                                if (_secondAccountIdController
+                                                if (_firstAccountIdController
+                                                    .text.isEmpty) {
+                                                  MotionToast.error(
+                                                    title: const Text(
+                                                      'Error',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    description: const Text(
+                                                        'Please enter first account id'),
+                                                    position:
+                                                        MotionToastPosition.top,
+                                                    barrierColor: Colors.black
+                                                        .withOpacity(0.3),
+                                                    width: 300,
+                                                    height: 80,
+                                                    dismissable: false,
+                                                  ).show(context);
+                                                } else if (_firstTransactionDateTimeController
+                                                    .text.isEmpty) {
+                                                  MotionToast.error(
+                                                    title: const Text(
+                                                      'Error',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    description: const Text(
+                                                        'Please enter first transaction date time'),
+                                                    position:
+                                                        MotionToastPosition.top,
+                                                    barrierColor: Colors.black
+                                                        .withOpacity(0.3),
+                                                    width: 300,
+                                                    height: 80,
+                                                    dismissable: false,
+                                                  ).show(context);
+                                                } else if (_firstTransactionParticularsController
+                                                    .text.isEmpty) {
+                                                  MotionToast.error(
+                                                    title: const Text(
+                                                      'Error',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    description: const Text(
+                                                        'Please enter first transaction particulars'),
+                                                    position:
+                                                        MotionToastPosition.top,
+                                                    barrierColor: Colors.black
+                                                        .withOpacity(0.3),
+                                                    width: 300,
+                                                    height: 80,
+                                                    dismissable: false,
+                                                  ).show(context);
+                                                } else if (_firstTransactionAmountController
+                                                    .text.isEmpty) {
+                                                  MotionToast.error(
+                                                    title: const Text(
+                                                      'Error',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    description: const Text(
+                                                        'Please enter first transaction amount'),
+                                                    position:
+                                                        MotionToastPosition.top,
+                                                    barrierColor: Colors.black
+                                                        .withOpacity(0.3),
+                                                    width: 300,
+                                                    height: 80,
+                                                    dismissable: false,
+                                                  ).show(context);
+                                                } else if (_secondAccountIdController
                                                     .text.isEmpty) {
                                                   MotionToast.error(
                                                     title: const Text(
@@ -564,12 +660,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                                             "1->2, 2->3 (Via.)") ||
                                                         (dropdownValue ==
                                                             "1->2, 2->3, 3->4") ||
-                                                        (dropdownValue ==
-                                                            "1->2, 2->3, 4->1") ||
-                                                        (dropdownValue ==
-                                                            "1->2, 2->3, 3->4, 4->1")) &&
-                                                    (_thirdAccountIdController
-                                                        .text.isEmpty)) {
+                                                        (dropdownValue == "1->2, 2->3, 4->1") ||
+                                                        (dropdownValue == "1->2, 2->3, 3->4, 4->1")) &&
+                                                    (_thirdAccountIdController.text.isEmpty)) {
                                                   MotionToast.error(
                                                     title: const Text(
                                                       'Error',
@@ -588,8 +681,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                     height: 80,
                                                     dismissable: false,
                                                   ).show(context);
-                                                } else if (((dropdownValue == "1->2, 2->3, 3->4") || (dropdownValue == "1->2, 2->3, 4->1") || (dropdownValue == "1->2, 2->3, 3->4, 4->1")) &&
-                                                    (_thirdTransactionParticularsController.text.isEmpty)) {
+                                                } else if (((dropdownValue == "1->2, 2->3, 3->4") || (dropdownValue == "1->2, 2->3, 4->1") || (dropdownValue == "1->2, 2->3, 3->4, 4->1")) && (_thirdTransactionParticularsController.text.isEmpty)) {
                                                   MotionToast.error(
                                                     title: const Text(
                                                       'Error',
@@ -724,6 +816,35 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void updateTransactionControllers() {
+    if (accountLedgerGistModelV2
+        .accountLedgerPages![_currentAccountIndex]
+        .transactionDatePages![_currentDateIndex]
+        .transactions![_currentTransactionIndex]
+        .transactionAmount!
+        .isNegative) {
+      _firstAccountIdController.text = accountLedgerGistModelV2
+          .accountLedgerPages![_currentAccountIndex].accountId
+          .toString();
+    } else {
+      _secondAccountIdController.text = accountLedgerGistModelV2
+          .accountLedgerPages![_currentAccountIndex].accountId
+          .toString();
+    }
+
+    _firstTransactionDateTimeController.text =
+        '${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactionDate} $_currentEventTime';
+    _firstTransactionParticularsController.text = accountLedgerGistModelV2
+        .accountLedgerPages![_currentAccountIndex]
+        .transactionDatePages![_currentDateIndex]
+        .transactions![_currentTransactionIndex]
+        .transactionParticulars!;
+    _firstTransactionAmountController.text = accountLedgerGistModelV2
+        .accountLedgerPages![_currentAccountIndex]
+        .transactionDatePages![_currentDateIndex]
+        .transactions![_currentTransactionIndex]
+        .transactionAmount
+        .toString();
+
     _secondTransactionParticularsController.text = accountLedgerGistModelV2
         .accountLedgerPages![_currentAccountIndex]
         .transactionDatePages![_currentDateIndex]
@@ -735,6 +856,7 @@ class _MyHomePageState extends State<MyHomePage> {
         .transactions![_currentTransactionIndex]
         .transactionAmount
         .toString();
+
     _thirdTransactionParticularsController.text = accountLedgerGistModelV2
         .accountLedgerPages![_currentAccountIndex]
         .transactionDatePages![_currentDateIndex]
@@ -746,6 +868,7 @@ class _MyHomePageState extends State<MyHomePage> {
         .transactions![_currentTransactionIndex]
         .transactionAmount
         .toString();
+
     _fourthTransactionParticularsController.text = accountLedgerGistModelV2
         .accountLedgerPages![_currentAccountIndex]
         .transactionDatePages![_currentDateIndex]
@@ -770,6 +893,10 @@ class _MyHomePageState extends State<MyHomePage> {
     _fourthAccountIdController.dispose();
     _fourthTransactionParticularsController.dispose();
     _fourthTransactionAmountController.dispose();
+    _firstAccountIdController.dispose();
+    _firstTransactionDateTimeController.dispose();
+    _firstTransactionParticularsController.dispose();
+    _firstTransactionAmountController.dispose();
     super.dispose();
   }
 
@@ -836,37 +963,21 @@ class _MyHomePageState extends State<MyHomePage> {
       accountLedgerApiResultMessage =
           await runAccountLedgerInsertTwoWayTransactionOperationAsync(
               TransactionModal(
-                  u32(accountLedgerGistModelV2.userId!),
-                  "${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactionDate} $_currentEventTime",
-                  accountLedgerGistModelV2
-                      .accountLedgerPages![_currentAccountIndex]
-                      .transactionDatePages![_currentDateIndex]
-                      .transactions![_currentTransactionIndex]
-                      .transactionParticulars!,
-                  accountLedgerGistModelV2
-                      .accountLedgerPages![_currentAccountIndex]
-                      .transactionDatePages![_currentDateIndex]
-                      .transactions![_currentTransactionIndex]
-                      .transactionAmount!,
-                  accountLedgerGistModelV2
-                          .accountLedgerPages![_currentAccountIndex]
-                          .transactionDatePages![_currentDateIndex]
-                          .transactions![_currentTransactionIndex]
-                          .transactionAmount!
-                          .isNegative
-                      ? u32(accountLedgerGistModelV2
-                          .accountLedgerPages![_currentAccountIndex].accountId!)
-                      : u32.parse(_secondAccountIdController.text),
-                  accountLedgerGistModelV2
-                          .accountLedgerPages![_currentAccountIndex]
-                          .transactionDatePages![_currentDateIndex]
-                          .transactions![_currentTransactionIndex]
-                          .transactionAmount!
-                          .isNegative
-                      ? u32.parse(_secondAccountIdController.text)
-                      : u32(accountLedgerGistModelV2
-                          .accountLedgerPages![_currentAccountIndex]
-                          .accountId!)),
+                u32(
+                  accountLedgerGistModelV2.userId!,
+                ),
+                _firstTransactionDateTimeController.text,
+                _firstTransactionParticularsController.text,
+                double.parse(
+                  _firstTransactionAmountController.text,
+                ),
+                u32.parse(
+                  _firstAccountIdController.text,
+                ),
+                u32.parse(
+                  _secondAccountIdController.text,
+                ),
+              ),
               _secondTransactionParticularsController.text,
               double.parse(
                 _secondTransactionAmountController.text,
@@ -875,38 +986,22 @@ class _MyHomePageState extends State<MyHomePage> {
       accountLedgerApiResultMessage =
           await runAccountLedgerInsertOneTwoThreeOneTransactionOperationAsync(
               TransactionModal(
-                  u32(accountLedgerGistModelV2.userId!),
-                  "${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactionDate} $_currentEventTime",
-                  accountLedgerGistModelV2
-                      .accountLedgerPages![_currentAccountIndex]
-                      .transactionDatePages![_currentDateIndex]
-                      .transactions![_currentTransactionIndex]
-                      .transactionParticulars!,
-                  accountLedgerGistModelV2
-                      .accountLedgerPages![_currentAccountIndex]
-                      .transactionDatePages![_currentDateIndex]
-                      .transactions![_currentTransactionIndex]
-                      .transactionAmount!,
-                  accountLedgerGistModelV2
-                          .accountLedgerPages![_currentAccountIndex]
-                          .transactionDatePages![_currentDateIndex]
-                          .transactions![_currentTransactionIndex]
-                          .transactionAmount!
-                          .isNegative
-                      ? u32(accountLedgerGistModelV2
-                          .accountLedgerPages![_currentAccountIndex].accountId!)
-                      : u32.parse(_secondAccountIdController.text),
-                  accountLedgerGistModelV2
-                          .accountLedgerPages![_currentAccountIndex]
-                          .transactionDatePages![_currentDateIndex]
-                          .transactions![_currentTransactionIndex]
-                          .transactionAmount!
-                          .isNegative
-                      ? u32.parse(_secondAccountIdController.text)
-                      : u32(accountLedgerGistModelV2
-                          .accountLedgerPages![_currentAccountIndex]
-                          .accountId!)),
-              u32.parse(_thirdAccountIdController.text),
+                u32(accountLedgerGistModelV2.userId!),
+                _firstTransactionDateTimeController.text,
+                _firstTransactionParticularsController.text,
+                double.parse(
+                  _firstTransactionAmountController.text,
+                ),
+                u32.parse(
+                  _firstAccountIdController.text,
+                ),
+                u32.parse(
+                  _secondAccountIdController.text,
+                ),
+              ),
+              u32.parse(
+                _thirdAccountIdController.text,
+              ),
               _secondTransactionParticularsController.text,
               double.parse(
                 _secondTransactionAmountController.text,
@@ -915,38 +1010,22 @@ class _MyHomePageState extends State<MyHomePage> {
       accountLedgerApiResultMessage =
           await runAccountLedgerInsertOneTwoTwoThreeTransactionOperationAsync(
               TransactionModal(
-                  u32(accountLedgerGistModelV2.userId!),
-                  "${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactionDate} $_currentEventTime",
-                  accountLedgerGistModelV2
-                      .accountLedgerPages![_currentAccountIndex]
-                      .transactionDatePages![_currentDateIndex]
-                      .transactions![_currentTransactionIndex]
-                      .transactionParticulars!,
-                  accountLedgerGistModelV2
-                      .accountLedgerPages![_currentAccountIndex]
-                      .transactionDatePages![_currentDateIndex]
-                      .transactions![_currentTransactionIndex]
-                      .transactionAmount!,
-                  accountLedgerGistModelV2
-                          .accountLedgerPages![_currentAccountIndex]
-                          .transactionDatePages![_currentDateIndex]
-                          .transactions![_currentTransactionIndex]
-                          .transactionAmount!
-                          .isNegative
-                      ? u32(accountLedgerGistModelV2
-                          .accountLedgerPages![_currentAccountIndex].accountId!)
-                      : u32.parse(_secondAccountIdController.text),
-                  accountLedgerGistModelV2
-                          .accountLedgerPages![_currentAccountIndex]
-                          .transactionDatePages![_currentDateIndex]
-                          .transactions![_currentTransactionIndex]
-                          .transactionAmount!
-                          .isNegative
-                      ? u32.parse(_secondAccountIdController.text)
-                      : u32(accountLedgerGistModelV2
-                          .accountLedgerPages![_currentAccountIndex]
-                          .accountId!)),
-              u32.parse(_thirdAccountIdController.text),
+                u32(accountLedgerGistModelV2.userId!),
+                _firstTransactionDateTimeController.text,
+                _firstTransactionParticularsController.text,
+                double.parse(
+                  _firstTransactionAmountController.text,
+                ),
+                u32.parse(
+                  _firstAccountIdController.text,
+                ),
+                u32.parse(
+                  _secondAccountIdController.text,
+                ),
+              ),
+              u32.parse(
+                _thirdAccountIdController.text,
+              ),
               _secondTransactionParticularsController.text,
               double.parse(
                 _secondTransactionAmountController.text,
@@ -955,43 +1034,33 @@ class _MyHomePageState extends State<MyHomePage> {
       accountLedgerApiResultMessage =
           await runAccountLedgerInsertOneTwoTwoThreeThreeFourFourOneTransactionOperationAsync(
               TransactionModal(
-                  u32(accountLedgerGistModelV2.userId!),
-                  "${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactionDate} $_currentEventTime",
-                  accountLedgerGistModelV2
-                      .accountLedgerPages![_currentAccountIndex]
-                      .transactionDatePages![_currentDateIndex]
-                      .transactions![_currentTransactionIndex]
-                      .transactionParticulars!,
-                  accountLedgerGistModelV2
-                      .accountLedgerPages![_currentAccountIndex]
-                      .transactionDatePages![_currentDateIndex]
-                      .transactions![_currentTransactionIndex]
-                      .transactionAmount!,
-                  accountLedgerGistModelV2
-                          .accountLedgerPages![_currentAccountIndex]
-                          .transactionDatePages![_currentDateIndex]
-                          .transactions![_currentTransactionIndex]
-                          .transactionAmount!
-                          .isNegative
-                      ? u32(accountLedgerGistModelV2
-                          .accountLedgerPages![_currentAccountIndex].accountId!)
-                      : u32.parse(_secondAccountIdController.text),
-                  accountLedgerGistModelV2
-                          .accountLedgerPages![_currentAccountIndex]
-                          .transactionDatePages![_currentDateIndex]
-                          .transactions![_currentTransactionIndex]
-                          .transactionAmount!
-                          .isNegative
-                      ? u32.parse(_secondAccountIdController.text)
-                      : u32(accountLedgerGistModelV2
-                          .accountLedgerPages![_currentAccountIndex]
-                          .accountId!)),
-              u32.parse(_thirdAccountIdController.text),
-              u32.parse(_fourthAccountIdController.text),
+                u32(accountLedgerGistModelV2.userId!),
+                _firstTransactionDateTimeController.text,
+                _firstTransactionParticularsController.text,
+                double.parse(
+                  _firstTransactionAmountController.text,
+                ),
+                u32.parse(
+                  _firstAccountIdController.text,
+                ),
+                u32.parse(
+                  _secondAccountIdController.text,
+                ),
+              ),
+              u32.parse(
+                _thirdAccountIdController.text,
+              ),
+              u32.parse(
+                _fourthAccountIdController.text,
+              ),
               _secondTransactionParticularsController.text,
-              double.parse(_secondTransactionAmountController.text),
+              double.parse(
+                _secondTransactionAmountController.text,
+              ),
               _thirdTransactionParticularsController.text,
-              double.parse(_thirdTransactionAmountController.text),
+              double.parse(
+                _thirdTransactionAmountController.text,
+              ),
               _fourthTransactionParticularsController.text,
               double.parse(
                 _fourthTransactionAmountController.text,
@@ -1000,41 +1069,29 @@ class _MyHomePageState extends State<MyHomePage> {
       accountLedgerApiResultMessage =
           await runAccountLedgerInsertOneTwoTwoThreeThreeFourTransactionOperationAsync(
               TransactionModal(
-                  u32(accountLedgerGistModelV2.userId!),
-                  "${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactionDate} $_currentEventTime",
-                  accountLedgerGistModelV2
-                      .accountLedgerPages![_currentAccountIndex]
-                      .transactionDatePages![_currentDateIndex]
-                      .transactions![_currentTransactionIndex]
-                      .transactionParticulars!,
-                  accountLedgerGistModelV2
-                      .accountLedgerPages![_currentAccountIndex]
-                      .transactionDatePages![_currentDateIndex]
-                      .transactions![_currentTransactionIndex]
-                      .transactionAmount!,
-                  accountLedgerGistModelV2
-                          .accountLedgerPages![_currentAccountIndex]
-                          .transactionDatePages![_currentDateIndex]
-                          .transactions![_currentTransactionIndex]
-                          .transactionAmount!
-                          .isNegative
-                      ? u32(accountLedgerGistModelV2
-                          .accountLedgerPages![_currentAccountIndex].accountId!)
-                      : u32.parse(_secondAccountIdController.text),
-                  accountLedgerGistModelV2
-                          .accountLedgerPages![_currentAccountIndex]
-                          .transactionDatePages![_currentDateIndex]
-                          .transactions![_currentTransactionIndex]
-                          .transactionAmount!
-                          .isNegative
-                      ? u32.parse(_secondAccountIdController.text)
-                      : u32(accountLedgerGistModelV2
-                          .accountLedgerPages![_currentAccountIndex]
-                          .accountId!)),
-              u32.parse(_thirdAccountIdController.text),
-              u32.parse(_fourthAccountIdController.text),
+                u32(accountLedgerGistModelV2.userId!),
+                _firstTransactionDateTimeController.text,
+                _firstTransactionParticularsController.text,
+                double.parse(
+                  _firstTransactionAmountController.text,
+                ),
+                u32.parse(
+                  _firstAccountIdController.text,
+                ),
+                u32.parse(
+                  _secondAccountIdController.text,
+                ),
+              ),
+              u32.parse(
+                _thirdAccountIdController.text,
+              ),
+              u32.parse(
+                _fourthAccountIdController.text,
+              ),
               _secondTransactionParticularsController.text,
-              double.parse(_secondTransactionAmountController.text),
+              double.parse(
+                _secondTransactionAmountController.text,
+              ),
               _thirdTransactionParticularsController.text,
               double.parse(
                 _thirdTransactionAmountController.text,
@@ -1044,41 +1101,29 @@ class _MyHomePageState extends State<MyHomePage> {
       accountLedgerApiResultMessage =
           await runAccountLedgerInsertOneTwoTwoThreeFourOneTransactionOperationAsync(
               TransactionModal(
-                  u32(accountLedgerGistModelV2.userId!),
-                  "${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactionDate} $_currentEventTime",
-                  accountLedgerGistModelV2
-                      .accountLedgerPages![_currentAccountIndex]
-                      .transactionDatePages![_currentDateIndex]
-                      .transactions![_currentTransactionIndex]
-                      .transactionParticulars!,
-                  accountLedgerGistModelV2
-                      .accountLedgerPages![_currentAccountIndex]
-                      .transactionDatePages![_currentDateIndex]
-                      .transactions![_currentTransactionIndex]
-                      .transactionAmount!,
-                  accountLedgerGistModelV2
-                          .accountLedgerPages![_currentAccountIndex]
-                          .transactionDatePages![_currentDateIndex]
-                          .transactions![_currentTransactionIndex]
-                          .transactionAmount!
-                          .isNegative
-                      ? u32(accountLedgerGistModelV2
-                          .accountLedgerPages![_currentAccountIndex].accountId!)
-                      : u32.parse(_secondAccountIdController.text),
-                  accountLedgerGistModelV2
-                          .accountLedgerPages![_currentAccountIndex]
-                          .transactionDatePages![_currentDateIndex]
-                          .transactions![_currentTransactionIndex]
-                          .transactionAmount!
-                          .isNegative
-                      ? u32.parse(_secondAccountIdController.text)
-                      : u32(accountLedgerGistModelV2
-                          .accountLedgerPages![_currentAccountIndex]
-                          .accountId!)),
-              u32.parse(_thirdAccountIdController.text),
-              u32.parse(_fourthAccountIdController.text),
+                u32(accountLedgerGistModelV2.userId!),
+                _firstTransactionDateTimeController.text,
+                _firstTransactionParticularsController.text,
+                double.parse(
+                  _firstTransactionAmountController.text,
+                ),
+                u32.parse(
+                  _firstAccountIdController.text,
+                ),
+                u32.parse(
+                  _secondAccountIdController.text,
+                ),
+              ),
+              u32.parse(
+                _thirdAccountIdController.text,
+              ),
+              u32.parse(
+                _fourthAccountIdController.text,
+              ),
               _secondTransactionParticularsController.text,
-              double.parse(_secondTransactionAmountController.text),
+              double.parse(
+                _secondTransactionAmountController.text,
+              ),
               _thirdTransactionParticularsController.text,
               double.parse(
                 _thirdTransactionAmountController.text,
@@ -1086,37 +1131,22 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {
       // dropdownValue == "Normal"
       accountLedgerApiResultMessage =
-          await runAccountLedgerInsertTransactionOperationAsync(TransactionModal(
-              u32(accountLedgerGistModelV2.userId!),
-              "${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactionDate} $_currentEventTime",
-              accountLedgerGistModelV2
-                  .accountLedgerPages![_currentAccountIndex]
-                  .transactionDatePages![_currentDateIndex]
-                  .transactions![_currentTransactionIndex]
-                  .transactionParticulars!,
-              accountLedgerGistModelV2
-                  .accountLedgerPages![_currentAccountIndex]
-                  .transactionDatePages![_currentDateIndex]
-                  .transactions![_currentTransactionIndex]
-                  .transactionAmount!,
-              accountLedgerGistModelV2
-                      .accountLedgerPages![_currentAccountIndex]
-                      .transactionDatePages![_currentDateIndex]
-                      .transactions![_currentTransactionIndex]
-                      .transactionAmount!
-                      .isNegative
-                  ? u32(accountLedgerGistModelV2
-                      .accountLedgerPages![_currentAccountIndex].accountId!)
-                  : u32.parse(_secondAccountIdController.text),
-              accountLedgerGistModelV2
-                      .accountLedgerPages![_currentAccountIndex]
-                      .transactionDatePages![_currentDateIndex]
-                      .transactions![_currentTransactionIndex]
-                      .transactionAmount!
-                      .isNegative
-                  ? u32.parse(_secondAccountIdController.text)
-                  : u32(accountLedgerGistModelV2
-                      .accountLedgerPages![_currentAccountIndex].accountId!)));
+          await runAccountLedgerInsertTransactionOperationAsync(
+        TransactionModal(
+          u32(accountLedgerGistModelV2.userId!),
+          _firstTransactionDateTimeController.text,
+          _firstTransactionParticularsController.text,
+          double.parse(
+            _firstTransactionAmountController.text,
+          ),
+          u32.parse(
+            _firstAccountIdController.text,
+          ),
+          u32.parse(
+            _secondAccountIdController.text,
+          ),
+        ),
+      );
     }
     setState(() {
       _isNotProcessingTransaction = true;
@@ -1127,6 +1157,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (accountLedgerApiResultMessage.accountLedgerApiResultStatus!.status ==
         0) {
       setState(() {
+        _firstAccountIdController.clear();
         _secondAccountIdController.clear();
         _thirdAccountIdController.clear();
         _fourthAccountIdController.clear();
