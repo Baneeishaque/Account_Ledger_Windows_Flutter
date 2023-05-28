@@ -1,10 +1,12 @@
 import 'dart:convert';
 
 import 'package:account_ledger_library_dart/account_ledger_api_result_message_modal.dart';
+import 'package:account_ledger_library_dart/accounts_with_execution_status_modal.dart';
 import 'package:account_ledger_library_dart/date_time_utils.dart';
 import 'package:account_ledger_library_dart/transaction_modal.dart';
 import 'package:account_ledger_library_dart/transaction_utils_api.dart';
 import 'package:audio_in_app/audio_in_app.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:integer/integer.dart';
@@ -56,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _currentDateIndex = 0;
   String _currentEventTime = "11:05:00";
   int _currentTransactionIndex = 0;
-  static const List<String> list = <String>[
+  static const List<String> transactionModes = <String>[
     "Normal",
     "Two-Way",
     "1->2, 3->1",
@@ -65,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
     "1->2, 2->3, 4->1",
     "1->2, 2->3, 3->4, 4->1",
   ];
-  String dropdownValue = list.first;
+  String dropdownValue = transactionModes.first;
   bool _isNotProcessingTransaction = true;
   late TextEditingController _secondAccountIdController;
   late TextEditingController _secondTransactionParticularsController;
@@ -81,6 +83,61 @@ class _MyHomePageState extends State<MyHomePage> {
   late TextEditingController _firstTransactionDateTimeController;
   late TextEditingController _firstTransactionParticularsController;
   late TextEditingController _firstTransactionAmountController;
+
+  List<AccountHead> _accountHeads = List.empty(growable: true);
+
+  Future<List<AccountHead>> getUserAccountHeads(filter) async {
+    if (_accountHeads.isEmpty) {
+      AccountsWithExecutionStatus accountsWithExecutionStatus =
+          await runAccountLedgerGetAccountsOperationAsync(
+        u32(accountLedgerGistModelV2.userId!),
+      );
+      if (accountsWithExecutionStatus.isOK!) {
+        _accountHeads = accountsWithExecutionStatus.data!;
+      } else {
+        debugPrint(accountsWithExecutionStatus.error);
+        return [];
+      }
+    }
+    debugPrint(filter);
+    if (filter.toString().isNotEmpty) {
+      var accountId = int.tryParse(filter);
+      if (accountId == null) {
+        return _accountHeads
+            .where((element) => element.name!
+                .toLowerCase()
+                .contains(filter.toString().toLowerCase()))
+            .toList();
+      } else {
+        return _accountHeads
+            .where((element) =>
+                ((element.id.toString().contains(filter.toString())) ||
+                    (element.name!
+                        .toLowerCase()
+                        .contains(filter.toString().toLowerCase()))))
+            .toList();
+      }
+    }
+    return _accountHeads;
+  }
+
+  Widget _customPopupItemBuilderForAccountHeads(
+      BuildContext context, AccountHead accountHead, bool isSelected) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8),
+      decoration: !isSelected
+          ? null
+          : BoxDecoration(
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
+      child: ListTile(
+        selected: isSelected,
+        title: Text("${accountHead.fullName} [${accountHead.id}]"),
+      ),
+    );
+  }
 
   Future<void> _getGistData() async {
     setState(() {
@@ -193,35 +250,34 @@ class _MyHomePageState extends State<MyHomePage> {
                                     textAlign: TextAlign.start,
                                   ),
                                 ),
-                                TextField(
-                                    controller: _firstAccountIdController,
-                                    enabled: _isNotProcessingTransaction,
-                                    keyboardType: TextInputType.number,
-                                    decoration: const InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      labelText: 'First Account ID',
-                                    )),
-                                // Text(
-                                //   'Account ID : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].accountId}',
-                                //   textAlign: TextAlign.start,
-                                // ),
-                                const Text(
-                                  'Current Transaction',
-                                  textAlign: TextAlign.start,
+                                getTopPaddingWidget(
+                                  widget: const Text(
+                                    'Current Transaction',
+                                    textAlign: TextAlign.start,
+                                  ),
                                 ),
                                 TextField(
+                                  controller: _firstAccountIdController,
+                                  enabled: _isNotProcessingTransaction,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    labelText: 'First Account ID',
+                                  ),
+                                ),
+                                getTopPaddingWidget(
+                                  widget: TextField(
                                     controller:
                                         _firstTransactionDateTimeController,
                                     enabled: _isNotProcessingTransaction,
                                     decoration: const InputDecoration(
                                       border: OutlineInputBorder(),
                                       labelText: 'Event Date Time',
-                                    )),
-                                // Text(
-                                //   'Event Date Time : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactionDate} $_currentEventTime',
-                                //   textAlign: TextAlign.start,
-                                // ),
-                                TextField(
+                                    ),
+                                  ),
+                                ),
+                                getTopPaddingWidget(
+                                  widget: TextField(
                                     controller:
                                         _firstTransactionParticularsController,
                                     enabled: _isNotProcessingTransaction,
@@ -229,59 +285,20 @@ class _MyHomePageState extends State<MyHomePage> {
                                       border: OutlineInputBorder(),
                                       labelText:
                                           'First Transaction Particulars',
-                                    )),
-                                // Text(
-                                //   'Particulars : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactions![_currentTransactionIndex].transactionParticulars}',
-                                //   textAlign: TextAlign.start,
-                                // ),
-                                TextField(
+                                    ),
+                                  ),
+                                ),
+                                getTopPaddingWidget(
+                                  widget: TextField(
                                     controller:
                                         _firstTransactionAmountController,
                                     enabled: _isNotProcessingTransaction,
                                     decoration: const InputDecoration(
                                       border: OutlineInputBorder(),
                                       labelText: 'First Transaction Amount',
-                                    )),
-                                // Text(
-                                //   'Amount : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].transactionDatePages![_currentDateIndex].transactions![_currentTransactionIndex].transactionAmount}',
-                                //   textAlign: TextAlign.start,
-                                // ),
-                                // accountLedgerGistModelV2
-                                //         .accountLedgerPages![
-                                //             _currentAccountIndex]
-                                //         .transactionDatePages![
-                                //             _currentDateIndex]
-                                //         .transactions![_currentTransactionIndex]
-                                //         .transactionAmount!
-                                //         .isNegative
-                                //     ? Column(
-                                //         mainAxisAlignment:
-                                //             MainAxisAlignment.start,
-                                //         children: [
-                                //           Text(
-                                //             'From A/C : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].accountId}',
-                                //             textAlign: TextAlign.start,
-                                //           ),
-                                //           const Text(
-                                //             'To A/C : - ',
-                                //             textAlign: TextAlign.start,
-                                //           ),
-                                //         ],
-                                //       )
-                                //     : Column(
-                                //         mainAxisAlignment:
-                                //             MainAxisAlignment.start,
-                                //         children: [
-                                //           const Text(
-                                //             'From A/C : - ',
-                                //             textAlign: TextAlign.start,
-                                //           ),
-                                //           Text(
-                                //             'To A/C : ${accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex].accountId}',
-                                //             textAlign: TextAlign.start,
-                                //           ),
-                                //         ],
-                                //       ),
+                                    ),
+                                  ),
+                                ),
                                 getTopPaddingWidget(
                                     padding: const EdgeInsets.only(
                                       top: 16.0,
@@ -297,26 +314,16 @@ class _MyHomePageState extends State<MyHomePage> {
                                         ))),
                                 SizedBox(
                                   width: double.infinity,
-                                  child: DropdownButton<String>(
-                                    alignment: Alignment.center,
-                                    value: dropdownValue,
+                                  child: DropdownSearch<String>(
+                                    items: transactionModes,
+                                    enabled: _isNotProcessingTransaction,
+                                    selectedItem: dropdownValue,
                                     onChanged: (String? value) {
                                       setState(() {
                                         dropdownValue = value!;
                                         debugPrint(dropdownValue);
                                       });
                                     },
-                                    items: list.map<DropdownMenuItem<String>>(
-                                        (String value) {
-                                      return DropdownMenuItem<String>(
-                                        alignment: Alignment.center,
-                                        value: value,
-                                        child: Text(
-                                          value,
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      );
-                                    }).toList(),
                                   ),
                                 ),
                                 ((dropdownValue == "Two-Way") ||
@@ -459,25 +466,64 @@ class _MyHomePageState extends State<MyHomePage> {
                                                         'Fourth Transaction Particulars',
                                                   ))),
                                           getTopPaddingWidget(
-                                              widget: TextField(
-                                                  controller:
-                                                      _fourthTransactionAmountController,
-                                                  enabled:
-                                                      _isNotProcessingTransaction,
-                                                  keyboardType:
-                                                      const TextInputType
-                                                          .numberWithOptions(
-                                                          decimal: true),
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    border:
-                                                        OutlineInputBorder(),
-                                                    labelText:
-                                                        'Fourth Transaction Amount',
-                                                  )))
+                                            widget: TextField(
+                                              controller:
+                                                  _fourthTransactionAmountController,
+                                              enabled:
+                                                  _isNotProcessingTransaction,
+                                              keyboardType: const TextInputType
+                                                  .numberWithOptions(
+                                                  decimal: true),
+                                              decoration: const InputDecoration(
+                                                border: OutlineInputBorder(),
+                                                labelText:
+                                                    'Fourth Transaction Amount',
+                                              ),
+                                            ),
+                                          ),
                                         ],
                                       )
                                     : Container(),
+                                // DropdownSearch<AccountHead>(
+                                //   asyncItems: (filter) =>
+                                //       getUserAccountHeads(filter),
+                                //   compareFn: (i, s) => i.isEqual(s),
+                                //   dropdownDecoratorProps:
+                                //       const DropDownDecoratorProps(
+                                //     dropdownSearchDecoration: InputDecoration(
+                                //       labelText: "First Account ID",
+                                //       hintText: "Select appropriate account",
+                                //       filled: true,
+                                //     ),
+                                //   ),
+                                //   itemAsString: (accountHead) {
+                                //     return "${accountHead.fullName} [${accountHead.id}]";
+                                //   },
+                                //   popupProps:
+                                //       PopupPropsMultiSelection.modalBottomSheet(
+                                //     isFilterOnline: true,
+                                //     showSelectedItems: true,
+                                //     showSearchBox: true,
+                                //     itemBuilder:
+                                //         _customPopupItemBuilderForAccountHeads,
+                                //     favoriteItemProps: FavoriteItemProps(
+                                //       showFavoriteItems: true,
+                                //       // favoriteItemBuilder: (buildContext,
+                                //       //     accountHead, isSelected) {
+                                //       //   return Text(accountHead.name!);
+                                //       // },
+                                //       favoriteItems: (accountHeads) {
+                                //         return accountHeads
+                                //             .where((accountHead) =>
+                                //                 (accountHead.id == 6) ||
+                                //                 (accountHead.id == 11) ||
+                                //                 (accountHead.id == 38) ||
+                                //                 (accountHead.id == 3111))
+                                //             .toList();
+                                //       },
+                                //     ),
+                                //   ),
+                                // ),
                                 getFullWidthOutlinedButton(
                                   text: 'Skip Transaction',
                                   onPressed: _isNotProcessingTransaction
@@ -493,292 +539,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         text: 'Submit Transaction',
                                         onPressed: _isNotProcessingTransaction
                                             ? () {
-                                                if (_firstAccountIdController
-                                                    .text.isEmpty) {
-                                                  MotionToast.error(
-                                                    title: const Text(
-                                                      'Error',
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    description: const Text(
-                                                        'Please enter first account id'),
-                                                    position:
-                                                        MotionToastPosition.top,
-                                                    barrierColor: Colors.black
-                                                        .withOpacity(0.3),
-                                                    width: 300,
-                                                    height: 80,
-                                                    dismissable: false,
-                                                  ).show(context);
-                                                } else if (_firstTransactionDateTimeController
-                                                    .text.isEmpty) {
-                                                  MotionToast.error(
-                                                    title: const Text(
-                                                      'Error',
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    description: const Text(
-                                                        'Please enter first transaction date time'),
-                                                    position:
-                                                        MotionToastPosition.top,
-                                                    barrierColor: Colors.black
-                                                        .withOpacity(0.3),
-                                                    width: 300,
-                                                    height: 80,
-                                                    dismissable: false,
-                                                  ).show(context);
-                                                } else if (_firstTransactionParticularsController
-                                                    .text.isEmpty) {
-                                                  MotionToast.error(
-                                                    title: const Text(
-                                                      'Error',
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    description: const Text(
-                                                        'Please enter first transaction particulars'),
-                                                    position:
-                                                        MotionToastPosition.top,
-                                                    barrierColor: Colors.black
-                                                        .withOpacity(0.3),
-                                                    width: 300,
-                                                    height: 80,
-                                                    dismissable: false,
-                                                  ).show(context);
-                                                } else if (_firstTransactionAmountController
-                                                    .text.isEmpty) {
-                                                  MotionToast.error(
-                                                    title: const Text(
-                                                      'Error',
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    description: const Text(
-                                                        'Please enter first transaction amount'),
-                                                    position:
-                                                        MotionToastPosition.top,
-                                                    barrierColor: Colors.black
-                                                        .withOpacity(0.3),
-                                                    width: 300,
-                                                    height: 80,
-                                                    dismissable: false,
-                                                  ).show(context);
-                                                } else if (_secondAccountIdController
-                                                    .text.isEmpty) {
-                                                  MotionToast.error(
-                                                    title: const Text(
-                                                      'Error',
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    description: const Text(
-                                                        'Please enter second account id'),
-                                                    position:
-                                                        MotionToastPosition.top,
-                                                    barrierColor: Colors.black
-                                                        .withOpacity(0.3),
-                                                    width: 300,
-                                                    height: 80,
-                                                    dismissable: false,
-                                                  ).show(context);
-                                                } else if (((dropdownValue == "Two-Way") ||
-                                                        (dropdownValue ==
-                                                            "1->2, 3->1") ||
-                                                        (dropdownValue ==
-                                                            "1->2, 2->3 (Via.)") ||
-                                                        (dropdownValue ==
-                                                            "1->2, 2->3, 3->4") ||
-                                                        (dropdownValue ==
-                                                            "1->2, 2->3, 4->1") ||
-                                                        (dropdownValue ==
-                                                            "1->2, 2->3, 3->4, 4->1")) &&
-                                                    (_secondTransactionParticularsController
-                                                        .text.isEmpty)) {
-                                                  MotionToast.error(
-                                                    title: const Text(
-                                                      'Error',
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    description: const Text(
-                                                        'Please enter second transaction particulars'),
-                                                    position:
-                                                        MotionToastPosition.top,
-                                                    barrierColor: Colors.black
-                                                        .withOpacity(0.3),
-                                                    width: 300,
-                                                    height: 80,
-                                                    dismissable: false,
-                                                  ).show(context);
-                                                } else if (((dropdownValue == "Two-Way") ||
-                                                        (dropdownValue ==
-                                                            "1->2, 3->1") ||
-                                                        (dropdownValue ==
-                                                            "1->2, 2->3 (Via.)") ||
-                                                        (dropdownValue ==
-                                                            "1->2, 2->3, 3->4") ||
-                                                        (dropdownValue ==
-                                                            "1->2, 2->3, 4->1") ||
-                                                        (dropdownValue ==
-                                                            "1->2, 2->3, 3->4, 4->1")) &&
-                                                    (_secondTransactionAmountController
-                                                        .text.isEmpty)) {
-                                                  MotionToast.error(
-                                                    title: const Text(
-                                                      'Error',
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    description: const Text(
-                                                        'Please enter second transaction amount'),
-                                                    position:
-                                                        MotionToastPosition.top,
-                                                    barrierColor: Colors.black
-                                                        .withOpacity(0.3),
-                                                    width: 300,
-                                                    height: 80,
-                                                    dismissable: false,
-                                                  ).show(context);
-                                                } else if (((dropdownValue == "1->2, 3->1") ||
-                                                        (dropdownValue ==
-                                                            "1->2, 2->3 (Via.)") ||
-                                                        (dropdownValue ==
-                                                            "1->2, 2->3, 3->4") ||
-                                                        (dropdownValue == "1->2, 2->3, 4->1") ||
-                                                        (dropdownValue == "1->2, 2->3, 3->4, 4->1")) &&
-                                                    (_thirdAccountIdController.text.isEmpty)) {
-                                                  MotionToast.error(
-                                                    title: const Text(
-                                                      'Error',
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    description: const Text(
-                                                        'Please enter third account id'),
-                                                    position:
-                                                        MotionToastPosition.top,
-                                                    barrierColor: Colors.black
-                                                        .withOpacity(0.3),
-                                                    width: 300,
-                                                    height: 80,
-                                                    dismissable: false,
-                                                  ).show(context);
-                                                } else if (((dropdownValue == "1->2, 2->3, 3->4") || (dropdownValue == "1->2, 2->3, 4->1") || (dropdownValue == "1->2, 2->3, 3->4, 4->1")) && (_thirdTransactionParticularsController.text.isEmpty)) {
-                                                  MotionToast.error(
-                                                    title: const Text(
-                                                      'Error',
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    description: const Text(
-                                                        'Please enter third transaction particulars'),
-                                                    position:
-                                                        MotionToastPosition.top,
-                                                    barrierColor: Colors.black
-                                                        .withOpacity(0.3),
-                                                    width: 300,
-                                                    height: 80,
-                                                    dismissable: false,
-                                                  ).show(context);
-                                                } else if (((dropdownValue == "1->2, 2->3, 3->4") || (dropdownValue == "1->2, 2->3, 4->1") || (dropdownValue == "1->2, 2->3, 3->4, 4->1")) && (_thirdTransactionAmountController.text.isEmpty)) {
-                                                  MotionToast.error(
-                                                    title: const Text(
-                                                      'Error',
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    description: const Text(
-                                                        'Please enter third transaction amount'),
-                                                    position:
-                                                        MotionToastPosition.top,
-                                                    barrierColor: Colors.black
-                                                        .withOpacity(0.3),
-                                                    width: 300,
-                                                    height: 80,
-                                                    dismissable: false,
-                                                  ).show(context);
-                                                } else if (((dropdownValue == "1->2, 2->3, 3->4") || (dropdownValue == "1->2, 2->3, 4->1") || (dropdownValue == "1->2, 2->3, 3->4, 4->1")) && (_fourthAccountIdController.text.isEmpty)) {
-                                                  MotionToast.error(
-                                                    title: const Text(
-                                                      'Error',
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    description: const Text(
-                                                        'Please enter fourth account id'),
-                                                    position:
-                                                        MotionToastPosition.top,
-                                                    barrierColor: Colors.black
-                                                        .withOpacity(0.3),
-                                                    width: 300,
-                                                    height: 80,
-                                                    dismissable: false,
-                                                  ).show(context);
-                                                } else if ((dropdownValue == "1->2, 2->3, 3->4, 4->1") && (_fourthTransactionParticularsController.text.isEmpty)) {
-                                                  MotionToast.error(
-                                                    title: const Text(
-                                                      'Error',
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    description: const Text(
-                                                        'Please enter fourth transaction particulars'),
-                                                    position:
-                                                        MotionToastPosition.top,
-                                                    barrierColor: Colors.black
-                                                        .withOpacity(0.3),
-                                                    width: 300,
-                                                    height: 80,
-                                                    dismissable: false,
-                                                  ).show(context);
-                                                } else if ((dropdownValue == "1->2, 2->3, 3->4, 4->1") && (_fourthTransactionAmountController.text.isEmpty)) {
-                                                  MotionToast.error(
-                                                    title: const Text(
-                                                      'Error',
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    description: const Text(
-                                                        'Please enter fourth transaction amount'),
-                                                    position:
-                                                        MotionToastPosition.top,
-                                                    barrierColor: Colors.black
-                                                        .withOpacity(0.3),
-                                                    width: 300,
-                                                    height: 80,
-                                                    dismissable: false,
-                                                  ).show(context);
-                                                } else {
-                                                  invokeSubmitTransaction();
-                                                }
+                                                validateThenSubmit(context);
                                               }
                                             : null,
                                       )
@@ -813,6 +574,235 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
+  }
+
+  void validateThenSubmit(BuildContext context) {
+    if (_firstAccountIdController.text.isEmpty) {
+      MotionToast.error(
+        title: const Text(
+          'Error',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        description: const Text('Please enter first account id'),
+        position: MotionToastPosition.top,
+        barrierColor: Colors.black.withOpacity(0.3),
+        width: 300,
+        height: 80,
+        dismissable: false,
+      ).show(context);
+    } else if (_firstTransactionDateTimeController.text.isEmpty) {
+      MotionToast.error(
+        title: const Text(
+          'Error',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        description: const Text('Please enter first transaction date time'),
+        position: MotionToastPosition.top,
+        barrierColor: Colors.black.withOpacity(0.3),
+        width: 300,
+        height: 80,
+        dismissable: false,
+      ).show(context);
+    } else if (_firstTransactionParticularsController.text.isEmpty) {
+      MotionToast.error(
+        title: const Text(
+          'Error',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        description: const Text('Please enter first transaction particulars'),
+        position: MotionToastPosition.top,
+        barrierColor: Colors.black.withOpacity(0.3),
+        width: 300,
+        height: 80,
+        dismissable: false,
+      ).show(context);
+    } else if (_firstTransactionAmountController.text.isEmpty) {
+      MotionToast.error(
+        title: const Text(
+          'Error',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        description: const Text('Please enter first transaction amount'),
+        position: MotionToastPosition.top,
+        barrierColor: Colors.black.withOpacity(0.3),
+        width: 300,
+        height: 80,
+        dismissable: false,
+      ).show(context);
+    } else if (_secondAccountIdController.text.isEmpty) {
+      MotionToast.error(
+        title: const Text(
+          'Error',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        description: const Text('Please enter second account id'),
+        position: MotionToastPosition.top,
+        barrierColor: Colors.black.withOpacity(0.3),
+        width: 300,
+        height: 80,
+        dismissable: false,
+      ).show(context);
+    } else if (((dropdownValue == "Two-Way") ||
+            (dropdownValue == "1->2, 3->1") ||
+            (dropdownValue == "1->2, 2->3 (Via.)") ||
+            (dropdownValue == "1->2, 2->3, 3->4") ||
+            (dropdownValue == "1->2, 2->3, 4->1") ||
+            (dropdownValue == "1->2, 2->3, 3->4, 4->1")) &&
+        (_secondTransactionParticularsController.text.isEmpty)) {
+      MotionToast.error(
+        title: const Text(
+          'Error',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        description: const Text('Please enter second transaction particulars'),
+        position: MotionToastPosition.top,
+        barrierColor: Colors.black.withOpacity(0.3),
+        width: 300,
+        height: 80,
+        dismissable: false,
+      ).show(context);
+    } else if (((dropdownValue == "Two-Way") ||
+            (dropdownValue == "1->2, 3->1") ||
+            (dropdownValue == "1->2, 2->3 (Via.)") ||
+            (dropdownValue == "1->2, 2->3, 3->4") ||
+            (dropdownValue == "1->2, 2->3, 4->1") ||
+            (dropdownValue == "1->2, 2->3, 3->4, 4->1")) &&
+        (_secondTransactionAmountController.text.isEmpty)) {
+      MotionToast.error(
+        title: const Text(
+          'Error',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        description: const Text('Please enter second transaction amount'),
+        position: MotionToastPosition.top,
+        barrierColor: Colors.black.withOpacity(0.3),
+        width: 300,
+        height: 80,
+        dismissable: false,
+      ).show(context);
+    } else if (((dropdownValue == "1->2, 3->1") ||
+            (dropdownValue == "1->2, 2->3 (Via.)") ||
+            (dropdownValue == "1->2, 2->3, 3->4") ||
+            (dropdownValue == "1->2, 2->3, 4->1") ||
+            (dropdownValue == "1->2, 2->3, 3->4, 4->1")) &&
+        (_thirdAccountIdController.text.isEmpty)) {
+      MotionToast.error(
+        title: const Text(
+          'Error',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        description: const Text('Please enter third account id'),
+        position: MotionToastPosition.top,
+        barrierColor: Colors.black.withOpacity(0.3),
+        width: 300,
+        height: 80,
+        dismissable: false,
+      ).show(context);
+    } else if (((dropdownValue == "1->2, 2->3, 3->4") ||
+            (dropdownValue == "1->2, 2->3, 4->1") ||
+            (dropdownValue == "1->2, 2->3, 3->4, 4->1")) &&
+        (_thirdTransactionParticularsController.text.isEmpty)) {
+      MotionToast.error(
+        title: const Text(
+          'Error',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        description: const Text('Please enter third transaction particulars'),
+        position: MotionToastPosition.top,
+        barrierColor: Colors.black.withOpacity(0.3),
+        width: 300,
+        height: 80,
+        dismissable: false,
+      ).show(context);
+    } else if (((dropdownValue == "1->2, 2->3, 3->4") ||
+            (dropdownValue == "1->2, 2->3, 4->1") ||
+            (dropdownValue == "1->2, 2->3, 3->4, 4->1")) &&
+        (_thirdTransactionAmountController.text.isEmpty)) {
+      MotionToast.error(
+        title: const Text(
+          'Error',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        description: const Text('Please enter third transaction amount'),
+        position: MotionToastPosition.top,
+        barrierColor: Colors.black.withOpacity(0.3),
+        width: 300,
+        height: 80,
+        dismissable: false,
+      ).show(context);
+    } else if (((dropdownValue == "1->2, 2->3, 3->4") ||
+            (dropdownValue == "1->2, 2->3, 4->1") ||
+            (dropdownValue == "1->2, 2->3, 3->4, 4->1")) &&
+        (_fourthAccountIdController.text.isEmpty)) {
+      MotionToast.error(
+        title: const Text(
+          'Error',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        description: const Text('Please enter fourth account id'),
+        position: MotionToastPosition.top,
+        barrierColor: Colors.black.withOpacity(0.3),
+        width: 300,
+        height: 80,
+        dismissable: false,
+      ).show(context);
+    } else if ((dropdownValue == "1->2, 2->3, 3->4, 4->1") &&
+        (_fourthTransactionParticularsController.text.isEmpty)) {
+      MotionToast.error(
+        title: const Text(
+          'Error',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        description: const Text('Please enter fourth transaction particulars'),
+        position: MotionToastPosition.top,
+        barrierColor: Colors.black.withOpacity(0.3),
+        width: 300,
+        height: 80,
+        dismissable: false,
+      ).show(context);
+    } else if ((dropdownValue == "1->2, 2->3, 3->4, 4->1") &&
+        (_fourthTransactionAmountController.text.isEmpty)) {
+      MotionToast.error(
+        title: const Text(
+          'Error',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        description: const Text('Please enter fourth transaction amount'),
+        position: MotionToastPosition.top,
+        barrierColor: Colors.black.withOpacity(0.3),
+        width: 300,
+        height: 80,
+        dismissable: false,
+      ).show(context);
+    } else {
+      invokeSubmitTransaction();
+    }
   }
 
   void updateTransactionControllers() {
@@ -901,6 +891,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void jumpToNextTransaction() {
+    clearAccountIds();
     if (accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex]
             .transactionDatePages![_currentDateIndex].transactions!.length !=
         (_currentTransactionIndex + 1)) {
@@ -1157,14 +1148,18 @@ class _MyHomePageState extends State<MyHomePage> {
     if (accountLedgerApiResultMessage.accountLedgerApiResultStatus!.status ==
         0) {
       setState(() {
-        _firstAccountIdController.clear();
-        _secondAccountIdController.clear();
-        _thirdAccountIdController.clear();
-        _fourthAccountIdController.clear();
+        clearAccountIds();
         _currentEventTime = normalTimeFormat.format(normalDateTimeFormat
             .parse(accountLedgerApiResultMessage.newDateTime!));
         jumpToNextTransaction();
       });
     }
+  }
+
+  void clearAccountIds() {
+    _firstAccountIdController.clear();
+    _secondAccountIdController.clear();
+    _thirdAccountIdController.clear();
+    _fourthAccountIdController.clear();
   }
 }
