@@ -1087,8 +1087,7 @@ class _MyHomePageState extends State<MyHomePage> {
               double.parse(
                 _thirdTransactionAmountController.text,
               ));
-    }
-    if (dropdownValue == "1->2, 2->3, 4->1") {
+    } else if (dropdownValue == "1->2, 2->3, 4->1") {
       accountLedgerApiResultMessage =
           await runAccountLedgerInsertOneTwoTwoThreeFourOneTransactionOperationAsync(
               TransactionModal(
