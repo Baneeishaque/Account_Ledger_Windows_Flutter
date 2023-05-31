@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="account_ledger_library" type="DartCommandLineRunConfigurationType" factoryName="Dart Command Line Application">
+    <option name="filePath" value="$PROJECT_DIR$/account_ledger_library_dart/bin/account_ledger_library.dart" />
+    <option name="workingDirectory" value="$PROJECT_DIR$/account_ledger_library_dart" />
+    <method v="2" />
+  </configuration>
+</component>
