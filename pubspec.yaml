@@ -12,7 +12,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   motion_toast: ^2.6.8
   await_sleep: ^1.0.1
-  account_ledger_library_dart:
+  account_ledger_library:
     path: account_ledger_library_dart
   integer: ^2.0.1
   audio_in_app: ^1.0.1
