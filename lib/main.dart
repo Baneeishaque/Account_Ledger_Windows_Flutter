@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:account_ledger_library/common_utils/date_time_utils.dart';
 import 'package:account_ledger_library/modals/account_ledger_api_result_message_modal.dart';
 import 'package:account_ledger_library/modals/accounts_with_execution_status_modal.dart';
+import 'package:account_ledger_library/modals/relation_of_accounts_modal.dart';
 import 'package:account_ledger_library/modals/transaction_modal.dart';
+import 'package:account_ledger_library/relations_of_accounts.dart';
 import 'package:account_ledger_library/transaction_api.dart';
 import 'package:audio_in_app/audio_in_app.dart';
 import 'package:dropdown_search/dropdown_search.dart';
@@ -85,6 +87,9 @@ class _MyHomePageState extends State<MyHomePage> {
   late TextEditingController _firstTransactionAmountController;
 
   List<AccountHead> _accountHeads = List.empty(growable: true);
+
+  String _firstAccountIdTextFieldLabelText = 'First Account ID';
+  String _secondAccountIdTextFieldLabelText = 'Second A/C ID';
 
   Future<List<AccountHead>> getUserAccountHeads(filter) async {
     if (_accountHeads.isEmpty) {
@@ -260,9 +265,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                   controller: _firstAccountIdController,
                                   enabled: _isNotProcessingTransaction,
                                   keyboardType: TextInputType.number,
-                                  decoration: const InputDecoration(
-                                    border: OutlineInputBorder(),
-                                    labelText: 'First Account ID',
+                                  decoration: InputDecoration(
+                                    border: const OutlineInputBorder(),
+                                    labelText:
+                                        _firstAccountIdTextFieldLabelText,
                                   ),
                                 ),
                                 getTopPaddingWidget(
@@ -308,9 +314,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                         controller: _secondAccountIdController,
                                         enabled: _isNotProcessingTransaction,
                                         keyboardType: TextInputType.number,
-                                        decoration: const InputDecoration(
-                                          border: OutlineInputBorder(),
-                                          labelText: 'Second A/C ID',
+                                        decoration: InputDecoration(
+                                          border: const OutlineInputBorder(),
+                                          labelText:
+                                              _secondAccountIdTextFieldLabelText,
                                         ))),
                                 SizedBox(
                                   width: double.infinity,
@@ -806,19 +813,84 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void updateTransactionControllers() {
-    if (accountLedgerGistModelV2
-        .accountLedgerPages![_currentAccountIndex]
-        .transactionDatePages![_currentDateIndex]
-        .transactions![_currentTransactionIndex]
-        .transactionAmount!
-        .isNegative) {
-      _firstAccountIdController.text = accountLedgerGistModelV2
-          .accountLedgerPages![_currentAccountIndex].accountId
-          .toString();
+    String accountIdTextFieldLabelOffset = "";
+
+    RelationOfAccountsNormalisedModal relationOfAccountsNormalised =
+        readRelationsOfAccountsInNormalForm();
+    debugPrint(relationOfAccountsNormalised.toString());
+
+    List<Relations>? relationList = relationOfAccountsNormalised
+        .userAccounts[accountLedgerGistModelV2.userId]?[accountLedgerGistModelV2
+            .accountLedgerPages![_currentAccountIndex].accountId]
+        ?.where((relation) => accountLedgerGistModelV2
+            .accountLedgerPages![_currentAccountIndex]
+            .transactionDatePages![_currentDateIndex]
+            .transactions![_currentTransactionIndex]
+            .transactionParticulars!
+            .toLowerCase()
+            .contains(relation.indicator!))
+        .toList();
+
+    if (relationList == null || relationList.isEmpty) {
+      _firstAccountIdTextFieldLabelText = "First Account ID";
+      _secondAccountIdTextFieldLabelText = "Second A/C ID";
+
+      if (accountLedgerGistModelV2
+          .accountLedgerPages![_currentAccountIndex]
+          .transactionDatePages![_currentDateIndex]
+          .transactions![_currentTransactionIndex]
+          .transactionAmount!
+          .isNegative) {
+        _firstAccountIdController.text = accountLedgerGistModelV2
+            .accountLedgerPages![_currentAccountIndex].accountId
+            .toString();
+      } else {
+        _secondAccountIdController.text = accountLedgerGistModelV2
+            .accountLedgerPages![_currentAccountIndex].accountId
+            .toString();
+      }
     } else {
-      _secondAccountIdController.text = accountLedgerGistModelV2
-          .accountLedgerPages![_currentAccountIndex].accountId
-          .toString();
+      if (relationList.first.associatedAccountId!.length > 1) {
+        accountIdTextFieldLabelOffset =
+            "$accountIdTextFieldLabelOffset : [${relationList.first.indicator} - ${relationList.first.associatedAccountId?.sublist(1)}]";
+      }
+      if (relationList.length > 1) {
+        for (int i = 1; i < relationList.length; i++) {
+          if (accountIdTextFieldLabelOffset.isEmpty) {
+            accountIdTextFieldLabelOffset =
+                "$accountIdTextFieldLabelOffset : [${relationList[i].indicator} - ${relationList[i].associatedAccountId}]";
+          } else {
+            accountIdTextFieldLabelOffset =
+                "$accountIdTextFieldLabelOffset, [${relationList[i].indicator} - ${relationList[i].associatedAccountId}]";
+          }
+        }
+      }
+      if (accountLedgerGistModelV2
+          .accountLedgerPages![_currentAccountIndex]
+          .transactionDatePages![_currentDateIndex]
+          .transactions![_currentTransactionIndex]
+          .transactionAmount!
+          .isNegative) {
+        _firstAccountIdController.text = accountLedgerGistModelV2
+            .accountLedgerPages![_currentAccountIndex].accountId
+            .toString();
+        _secondAccountIdController.text =
+            relationList.first.associatedAccountId![0].toString();
+
+        _firstAccountIdTextFieldLabelText = "First Account ID";
+        _secondAccountIdTextFieldLabelText =
+            "Second A/C ID$accountIdTextFieldLabelOffset";
+      } else {
+        _firstAccountIdController.text =
+            relationList.first.associatedAccountId![0].toString();
+        _secondAccountIdController.text = accountLedgerGistModelV2
+            .accountLedgerPages![_currentAccountIndex].accountId
+            .toString();
+
+        _firstAccountIdTextFieldLabelText =
+            "First Account ID$accountIdTextFieldLabelOffset";
+        _secondAccountIdTextFieldLabelText = "Second A/C ID";
+      }
     }
 
     _firstTransactionDateTimeController.text =
