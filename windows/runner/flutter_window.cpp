@@ -57,24 +57,26 @@ bool FlutterWindow::OnCreate() {
           flutter_controller_->engine()->messenger(), "samples.flutter.io/battery",
           &flutter::StandardMethodCodec::GetInstance());
   channel.SetMethodCallHandler(
-          [](const flutter::MethodCall<>& call,
-             std::unique_ptr<flutter::MethodResult<>> result) {
+      [](const flutter::MethodCall<>& call,
+          std::unique_ptr<flutter::MethodResult<>> result) {
               if (call.method_name() == "getBatteryLevel") {
-                int battery_level = GetBatteryLevel();
+                  int battery_level = GetBatteryLevel();
 
-                if (battery_level == kBatteryError) {
-                  result->Error("UNAVAILABLE", "Battery level not available.");
+                  if (battery_level == kBatteryError) {
+                      result->Error("UNAVAILABLE", "Battery level not available.");
                 } else if (battery_level == kNoBattery) {
-                  result->Error("NO_BATTERY", "Device does not have a battery.");
+                      result->Error("NO_BATTERY", "Device does not have a battery.");
                 } else {
-                  result->Success(battery_level);
-                }
+                      result->Success(battery_level);
+                  }
               } else if (call.method_name() == "getGistData") {
+
+                const flutter::EncodableMap* argsList = std::get_if<flutter::EncodableMap>(call.arguments());
 
                 account_ledger_lib_ExportedSymbols *lib = account_ledger_lib_symbols();
 
                 account_ledger_lib_kref_account_ledger_library_utils_GistUtils newInstance = lib->kotlin.root.account_ledger_library.utils.GistUtils.GistUtils();
-                string accountLedgerGistText  = lib->kotlin.root.account_ledger_library.utils.GistUtils.processGistIdForTextData(newInstance, "USERNAME", 0, "GITHUB_ACCESS_TOKEN", "GIST_ID", false, false);
+                string accountLedgerGistText = lib->kotlin.root.account_ledger_library.utils.GistUtils.processGistIdForTextData(newInstance, (static_cast<string> (std::get<string>(argsList->find(flutter::EncodableValue("USERNAME"))->second))).data(), 0, (static_cast<string> (std::get<string>(argsList->find(flutter::EncodableValue("GITHUB_ACCESS_TOKEN"))->second))).data(), (static_cast<string> (std::get<string>(argsList->find(flutter::EncodableValue("GIST_ID"))->second))).data(), false, false);
                 lib->DisposeStablePointer(newInstance.pinned);
 
                 result->Success(accountLedgerGistText);

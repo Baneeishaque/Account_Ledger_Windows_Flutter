@@ -151,7 +151,14 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     String gistData;
     try {
-      String? result = await methodChannel.invokeMethod<String>('getGistData');
+      String? result = await methodChannel.invokeMethod<String>(
+        'getGistData',
+        {
+          "USERNAME": "test",
+          "GITHUB_ACCESS_TOKEN": "test2",
+          "GIST_ID": "test3",
+        },
+      );
       accountLedgerGistModelV2 =
           AccountLedgerGistModelV2.fromJson(jsonDecode(result!));
       // debugPrint(result);
