@@ -7,6 +7,7 @@ import 'package:account_ledger_library/modals/relation_of_accounts_modal.dart';
 import 'package:account_ledger_library/modals/transaction_modal.dart';
 import 'package:account_ledger_library/relations_of_accounts.dart';
 import 'package:account_ledger_library/transaction_api.dart';
+import 'package:account_ledger_windows/env/env.dart';
 import 'package:audio_in_app/audio_in_app.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ import 'account_ledger_gist_model_v2.dart';
 import 'widget_helpers.dart';
 
 void main() {
+  print(Env.username);
   runApp(const MyApp());
 }
 

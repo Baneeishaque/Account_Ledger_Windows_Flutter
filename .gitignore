@@ -44,3 +44,6 @@ app.*.map.json
 /android/app/release
 
 relationOfAccounts.json
+.env
+
+lib/env/env.g.dart
