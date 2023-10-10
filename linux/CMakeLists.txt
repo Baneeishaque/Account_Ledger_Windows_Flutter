@@ -79,6 +79,11 @@ target_link_libraries(${BINARY_NAME} PRIVATE PkgConfig::UPowerGlib)
 # Run the Flutter tool portions of the build. This must not be removed.
 add_dependencies(${BINARY_NAME} flutter_assemble)
 
+add_library(kotlin_native SHARED IMPORTED)
+set_target_properties(kotlin_native PROPERTIES
+        IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/../account_ledger_lib_kotlin_native/lib/build/bin/linuxX64/debugShared/libaccount_ledger_lib.so")
+target_link_libraries(${BINARY_NAME} PRIVATE kotlin_native)
+
 # Only the install-generated bundle's copy of the executable will launch
 # correctly, since the resources must in the right relative locations. To avoid
 # people trying to run the unbundled copy, put it in a subdirectory instead of
