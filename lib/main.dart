@@ -161,13 +161,12 @@ class _MyHomePageState extends State<MyHomePage> {
           "GIST_ID": "test3",
         },
       );
+      debugPrint(result);
       accountLedgerGistModelV2 =
           AccountLedgerGistModelV2.fromJson(jsonDecode(result!));
-      // debugPrint(result);
-      // debugPrint(accountLedgerGistModelV2.toJson().toString());
+      debugPrint(accountLedgerGistModelV2.toJson().toString());
       // accountLedgerGistModelV2.accountLedgerPages =
       //     accountLedgerGistModelV2.accountLedgerPages!.sublist(11);
-      debugPrint(accountLedgerGistModelV2.toJson().toString());
       gistData = 'Gist Data: $result';
     } on PlatformException catch (e) {
       gistData = 'Gist Data: Error - ${e.message}';
