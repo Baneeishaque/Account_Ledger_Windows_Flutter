@@ -45,10 +45,12 @@ static void battery_method_call_handler(FlMethodChannel* channel,
     response = get_battery_level();
   } else if (strcmp(fl_method_call_get_name(method_call), "getGistData") == 0) {
 
+    FlValue* argsList = fl_method_call_get_args(method_call);
+
     libaccount_ledger_lib_ExportedSymbols *lib = libaccount_ledger_lib_symbols();
 
     libaccount_ledger_lib_kref_account_ledger_library_utils_GistUtils newInstance = lib->kotlin.root.account_ledger_library.utils.GistUtils.GistUtils();
-    const char *accountLedgerGistText = lib->kotlin.root.account_ledger_library.utils.GistUtils.processGistIdForTextData(newInstance, "USERNAME", 0, "GITHUB_ACCESS_TOKEN", "GIST_ID", false, false);
+    const char *accountLedgerGistText = lib->kotlin.root.account_ledger_library.utils.GistUtils.processGistIdForTextData(newInstance, fl_value_get_string(fl_value_lookup_string(argsList, "USERNAME")), 0, fl_value_get_string(fl_value_lookup_string(argsList, "GITHUB_ACCESS_TOKEN")), fl_value_get_string(fl_value_lookup_string(argsList, "GIST_ID")), false, false);
     lib->DisposeStablePointer(newInstance.pinned);
 
     response = FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_string(accountLedgerGistText)));
