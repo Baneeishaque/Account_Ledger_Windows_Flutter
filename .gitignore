@@ -43,7 +43,9 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-relationOfAccounts.json
 .env
+relationOfAccounts.json
+frequencyOfAccounts.json
+api/http-client.env.json
 
 lib/env/env.g.dart
