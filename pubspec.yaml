@@ -15,7 +15,7 @@ dependencies:
   account_ledger_library:
     path: account_ledger_library_dart
   integer: ^2.0.1
-  audio_in_app: ^1.0.1
+  audio_in_app: ^2.0.0
   dropdown_search: ^5.0.6
   envied: ^0.3.0+3
 
