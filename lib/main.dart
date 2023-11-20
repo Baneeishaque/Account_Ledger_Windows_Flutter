@@ -62,6 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _currentDateIndex = 0;
   String _currentEventTime = "11:05:00";
   int _currentTransactionIndex = 0;
+  // TODO : Change to enum
   static const List<String> transactionModes = <String>[
     "Normal",
     "Two-Way",
