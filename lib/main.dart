@@ -18,8 +18,7 @@ import 'package:integer/integer.dart';
 import 'package:motion_toast/motion_toast.dart';
 import 'package:motion_toast/resources/arrays.dart';
 
-
-import 'widget_helpers.dart';
+import 'common_widget_helpers.dart';
 
 void main() {
   if (kDebugMode) {
@@ -131,24 +130,6 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     }
     return _accountHeads;
-  }
-
-  Widget _customPopupItemBuilderForAccountHeads(
-      BuildContext context, AccountHead accountHead, bool isSelected) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8),
-      decoration: !isSelected
-          ? null
-          : BoxDecoration(
-              border: Border.all(color: Theme.of(context).primaryColor),
-              borderRadius: BorderRadius.circular(5),
-              color: Colors.white,
-            ),
-      child: ListTile(
-        selected: isSelected,
-        title: Text("${accountHead.fullName} [${accountHead.id}]"),
-      ),
-    );
   }
 
   Future<void> _getGistData() async {
@@ -976,7 +957,13 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void jumpToNextTransaction() {
-    clearAccountIds();
+    clearTextEditingControllers([
+      _firstAccountIdController,
+      _secondAccountIdController,
+      _thirdAccountIdController,
+      _fourthAccountIdController,
+    ]);
+    
     if (accountLedgerGistModelV2.accountLedgerPages![_currentAccountIndex]
             .transactionDatePages![_currentDateIndex].transactions!.length !=
         (_currentTransactionIndex + 1)) {
@@ -1232,18 +1219,16 @@ class _MyHomePageState extends State<MyHomePage> {
     if (accountLedgerApiResultMessage.accountLedgerApiResultStatus.status ==
         0) {
       setState(() {
-        clearAccountIds();
+        clearTextEditingControllers([
+          _firstAccountIdController,
+          _secondAccountIdController,
+          _thirdAccountIdController,
+          _fourthAccountIdController,
+        ]);
         _currentEventTime = normalTimeFormat.format(normalDateTimeFormat
             .parse(accountLedgerApiResultMessage.newDateTime));
         jumpToNextTransaction();
       });
     }
-  }
-
-  void clearAccountIds() {
-    _firstAccountIdController.clear();
-    _secondAccountIdController.clear();
-    _thirdAccountIdController.clear();
-    _fourthAccountIdController.clear();
   }
 }
