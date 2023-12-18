@@ -966,7 +966,7 @@ class _MyHomePageState extends State<MyHomePage> {
     AccountLedgerApiResultMessageModal accountLedgerApiResultMessage;
     if (dropdownValue == "Two-Way") {
       accountLedgerApiResultMessage =
-          await runAccountLedgerInsertTwoWayTransactionOperationAsync(
+          runAccountLedgerInsertTwoWayTransactionOperationAsync(
               TransactionModal(
                 u32(
                   _accountLedgerGistModelV2.userId!,
@@ -989,7 +989,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ));
     } else if (dropdownValue == "1->2, 3->1") {
       accountLedgerApiResultMessage =
-          await runAccountLedgerInsertOneTwoThreeOneTransactionOperationAsync(
+          runAccountLedgerInsertOneTwoThreeOneTransactionOperationAsync(
               TransactionModal(
                 u32(_accountLedgerGistModelV2.userId!),
                 _firstTransactionDateTimeController.text,
@@ -1013,7 +1013,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ));
     } else if (dropdownValue == "1->2, 2->3 (Via.)") {
       accountLedgerApiResultMessage =
-          await runAccountLedgerInsertOneTwoTwoThreeTransactionOperationAsync(
+          runAccountLedgerInsertOneTwoTwoThreeTransactionOperationAsync(
               TransactionModal(
                 u32(_accountLedgerGistModelV2.userId!),
                 _firstTransactionDateTimeController.text,
@@ -1037,7 +1037,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ));
     } else if (dropdownValue == "1->2, 2->3, 3->4, 4->1") {
       accountLedgerApiResultMessage =
-          await runAccountLedgerInsertOneTwoTwoThreeThreeFourFourOneTransactionOperationAsync(
+          runAccountLedgerInsertOneTwoTwoThreeThreeFourFourOneTransactionOperationAsync(
               TransactionModal(
                 u32(_accountLedgerGistModelV2.userId!),
                 _firstTransactionDateTimeController.text,
@@ -1072,7 +1072,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ));
     } else if (dropdownValue == "1->2, 2->3, 3->4") {
       accountLedgerApiResultMessage =
-          await runAccountLedgerInsertOneTwoTwoThreeThreeFourTransactionOperationAsync(
+          runAccountLedgerInsertOneTwoTwoThreeThreeFourTransactionOperationAsync(
               TransactionModal(
                 u32(_accountLedgerGistModelV2.userId!),
                 _firstTransactionDateTimeController.text,
@@ -1103,7 +1103,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ));
     } else if (dropdownValue == "1->2, 2->3, 4->1") {
       accountLedgerApiResultMessage =
-          await runAccountLedgerInsertOneTwoTwoThreeFourOneTransactionOperationAsync(
+          runAccountLedgerInsertOneTwoTwoThreeFourOneTransactionOperationAsync(
               TransactionModal(
                 u32(_accountLedgerGistModelV2.userId!),
                 _firstTransactionDateTimeController.text,
@@ -1135,7 +1135,7 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {
       // dropdownValue == "Normal"
       accountLedgerApiResultMessage =
-          await runAccountLedgerInsertTransactionOperationAsync(
+          runAccountLedgerInsertTransactionOperationWithTimeIncrementOnSuccess(
         TransactionModal(
           u32(_accountLedgerGistModelV2.userId!),
           _firstTransactionDateTimeController.text,
