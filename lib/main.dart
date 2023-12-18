@@ -100,10 +100,10 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<List<AccountHead>> getUserAccountHeads(filter) async {
     if (_accountHeads.isEmpty) {
       AccountsWithExecutionStatusModal accountsWithExecutionStatus =
-          await runAccountLedgerGetAccountsOperationAsync(
+          runAccountLedgerGetAccountsOperation(
         u32(accountLedgerGistModelV2.userId!),
       );
-      if (accountsWithExecutionStatus.isOK!) {
+      if (accountsWithExecutionStatus.isOK) {
         _accountHeads = accountsWithExecutionStatus.data!;
       } else {
         debugPrint(accountsWithExecutionStatus.error);
@@ -115,7 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
       var accountId = int.tryParse(filter);
       if (accountId == null) {
         return _accountHeads
-            .where((element) => element.name!
+            .where((element) => element.name
                 .toLowerCase()
                 .contains(filter.toString().toLowerCase()))
             .toList();
@@ -123,7 +123,7 @@ class _MyHomePageState extends State<MyHomePage> {
         return _accountHeads
             .where((element) =>
                 ((element.id.toString().contains(filter.toString())) ||
-                    (element.name!
+                    (element.name
                         .toLowerCase()
                         .contains(filter.toString().toLowerCase()))))
             .toList();
@@ -840,7 +840,7 @@ class _MyHomePageState extends State<MyHomePage> {
             .transactions![_currentTransactionIndex]
             .transactionParticulars!
             .toLowerCase()
-            .contains(relation.indicator!))
+            .contains(relation.indicator))
         .toList();
 
     if (relationList == null || relationList.isEmpty) {
@@ -862,9 +862,9 @@ class _MyHomePageState extends State<MyHomePage> {
             .toString();
       }
     } else {
-      if (relationList.first.associatedAccountId!.length > 1) {
+      if (relationList.first.associatedAccountId.length > 1) {
         accountIdTextFieldLabelOffset =
-            "$accountIdTextFieldLabelOffset : [${relationList.first.indicator} - ${relationList.first.associatedAccountId?.sublist(1)}]";
+            "$accountIdTextFieldLabelOffset : [${relationList.first.indicator} - ${relationList.first.associatedAccountId.sublist(1)}]";
       }
       if (relationList.length > 1) {
         for (int i = 1; i < relationList.length; i++) {
@@ -887,14 +887,14 @@ class _MyHomePageState extends State<MyHomePage> {
             .accountLedgerPages![_currentAccountIndex].accountId
             .toString();
         _secondAccountIdController.text =
-            relationList.first.associatedAccountId![0].toString();
+            relationList.first.associatedAccountId[0].toString();
 
         _firstAccountIdTextFieldLabelText = "First Account ID";
         _secondAccountIdTextFieldLabelText =
             "Second A/C ID$accountIdTextFieldLabelOffset";
       } else {
         _firstAccountIdController.text =
-            relationList.first.associatedAccountId![0].toString();
+            relationList.first.associatedAccountId[0].toString();
         _secondAccountIdController.text = accountLedgerGistModelV2
             .accountLedgerPages![_currentAccountIndex].accountId
             .toString();
@@ -1228,12 +1228,12 @@ class _MyHomePageState extends State<MyHomePage> {
           'API Result : ${jsonEncode(accountLedgerApiResultMessage.accountLedgerApiResultStatus)}';
     });
     playButton();
-    if (accountLedgerApiResultMessage.accountLedgerApiResultStatus!.status ==
+    if (accountLedgerApiResultMessage.accountLedgerApiResultStatus.status ==
         0) {
       setState(() {
         clearAccountIds();
         _currentEventTime = normalTimeFormat.format(normalDateTimeFormat
-            .parse(accountLedgerApiResultMessage.newDateTime!));
+            .parse(accountLedgerApiResultMessage.newDateTime));
         jumpToNextTransaction();
       });
     }
