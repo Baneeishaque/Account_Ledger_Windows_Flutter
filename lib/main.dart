@@ -92,45 +92,8 @@ class _MyHomePageState extends State<MyHomePage> {
   late TextEditingController _firstTransactionParticularsController;
   late TextEditingController _firstTransactionAmountController;
 
-  List<AccountHead> _accountHeads = List.empty(growable: true);
-
   String _firstAccountIdTextFieldLabelText = 'First Account ID';
   String _secondAccountIdTextFieldLabelText = 'Second A/C ID';
-
-  Future<List<AccountHead>> getUserAccountHeads(filter) async {
-    if (_accountHeads.isEmpty) {
-      AccountsWithExecutionStatusModal accountsWithExecutionStatus =
-          runAccountLedgerGetAccountsOperation(
-        u32(accountLedgerGistModelV2.userId!),
-      );
-      if (accountsWithExecutionStatus.isOK) {
-        _accountHeads = accountsWithExecutionStatus.data!;
-      } else {
-        debugPrint(accountsWithExecutionStatus.error);
-        return [];
-      }
-    }
-    debugPrint(filter);
-    if (filter.toString().isNotEmpty) {
-      var accountId = int.tryParse(filter);
-      if (accountId == null) {
-        return _accountHeads
-            .where((element) => element.name
-                .toLowerCase()
-                .contains(filter.toString().toLowerCase()))
-            .toList();
-      } else {
-        return _accountHeads
-            .where((element) =>
-                ((element.id.toString().contains(filter.toString())) ||
-                    (element.name
-                        .toLowerCase()
-                        .contains(filter.toString().toLowerCase()))))
-            .toList();
-      }
-    }
-    return _accountHeads;
-  }
 
   Future<void> _getGistData() async {
     setState(() {
@@ -151,8 +114,6 @@ class _MyHomePageState extends State<MyHomePage> {
       accountLedgerGistModelV2 =
           AccountLedgerGistModelV2.fromJson(jsonDecode(result!));
       debugPrint(accountLedgerGistModelV2.toJson().toString());
-      // accountLedgerGistModelV2.accountLedgerPages =
-      //     accountLedgerGistModelV2.accountLedgerPages!.sublist(11);
       gistData = 'Gist Data: $result';
     } on PlatformException catch (e) {
       gistData = 'Gist Data: Error - ${e.message}';
@@ -223,9 +184,6 @@ class _MyHomePageState extends State<MyHomePage> {
                         text: 'Get Gist Data',
                         onPressed: _getGistData,
                       ),
-            // getTopPaddingWidget(
-            //   widget: Text(_gistData, key: const Key('Gist data label')),
-            // ),
             _isDataLoaded
                 ? Column(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -1020,7 +978,6 @@ class _MyHomePageState extends State<MyHomePage> {
       _isNotProcessingTransaction = false;
     });
 
-    // await sleep(10);
     AccountLedgerApiResultMessageModal accountLedgerApiResultMessage;
     if (dropdownValue == "Two-Way") {
       accountLedgerApiResultMessage =
