@@ -1,9 +1,9 @@
-import 'package:account_ledger_library/modals/accounts_with_execution_status_modal.dart';
+import 'package:account_ledger_library/models/accounts_with_execution_status_model.dart';
 import 'package:flutter/material.dart';
 
 Widget customPopupItemBuilderForAccountHeads(
   BuildContext context,
-  AccountHead accountHead,
+  AccountHeadModel accountHead,
   bool isSelected,
 ) {
   return Container(
