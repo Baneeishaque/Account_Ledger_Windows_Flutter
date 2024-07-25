@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalDependencies">
+    <plugin id="String Manipulation" />
+    <plugin id="io.flutter" />
+    <plugin id="org.intellij.plugins.markdown" />
+    <plugin id="Batch Scripts Support" />
+    <plugin id="artsiomch.cmake.plus" />
+    <plugin id="com.intellij.plugin.adernov.powershell" />
+    <plugin id="com.jetbrains.sh" />
+    <plugin id="ru.adelf.idea.dotenv" />
+    <plugin id="com.jetbrains.restClient" />
+    <plugin id="com.intellij.database" />
+  </component>
+</project>
