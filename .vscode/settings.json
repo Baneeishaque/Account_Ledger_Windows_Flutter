@@ -5,6 +5,7 @@
         "dartdoc",
         "dblite",
         "dbnavigator",
+        "dcarbone",
         "dkms",
         "donotpresent",
         "dotenv",
@@ -17,6 +18,8 @@
         "hprof",
         "icns",
         "ionide",
+        "libglu",
+        "libstdc",
         "mergetool",
         "Mkfile",
         "mpeltonen",
@@ -33,6 +36,7 @@
         "stackdump",
         "symvers",
         "timemachine",
+        "vswhere",
         "xcconfig",
         "xcuserdata"
     ]

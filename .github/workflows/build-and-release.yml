@@ -1,0 +1,80 @@
+name: Build and Release Flutter App
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-linux:
+    name: Build Linux
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code with submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+      - name: Install Linux build dependencies
+        run: |
+          chmod +x ./.github/scripts/install-linux-deps.sh
+          ./.github/scripts/install-linux-deps.sh
+
+      - name: Install jq
+        uses: dcarbone/install-jq-action@v2.1.0
+
+      - name: Setup mise tool versions
+        uses: jdx/mise-action@v2
+
+      - name: Build Kotlin/Native Library for Linux
+        working-directory: ./account_ledger_lib_kotlin_native
+        run: ./gradlew linkDebugSharedLinuxX64
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Build Linux application
+        run: flutter build linux --release
+
+      - name: Upload Linux build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux-build
+          path: build/linux/x64/release/bundle
+
+  build-windows:
+    name: Build Windows
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code with submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+      - name: Verify Visual Studio Environment
+        shell: powershell
+        run: ./.github/scripts/verify-vs-workload.ps1
+
+      - name: Install jq
+        uses: dcarbone/install-jq-action@v2.1.0
+
+      - name: Setup mise tool versions
+        uses: jdx/mise-action@v2
+
+      - name: Build Kotlin/Native Library for Windows
+        working-directory: ./account_ledger_lib_kotlin_native
+        run: ./gradlew.bat linkDebugSharedMingwX64
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Build Windows application
+        run: flutter build windows --release
+
+      - name: Upload Windows build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-build
+          path: build/windows/runner/Release
