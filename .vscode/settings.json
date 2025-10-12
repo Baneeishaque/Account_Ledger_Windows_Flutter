@@ -21,6 +21,7 @@
         "ionide",
         "libglu",
         "libstdc",
+        "libupower",
         "mergetool",
         "Mkfile",
         "mpeltonen",

@@ -22,7 +22,8 @@ sudo apt-get install -y \
     xz-utils \
     zip \
     libglu1-mesa \
-    libstdc++-12-dev
+    libstdc++-12-dev \
+    libupower-glib-dev
 
 echo "SUCCESS: All Linux dependencies installed."
 
