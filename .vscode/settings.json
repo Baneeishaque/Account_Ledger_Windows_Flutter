@@ -36,6 +36,7 @@
         "stackdump",
         "symvers",
         "timemachine",
+        "vfox",
         "vswhere",
         "xcconfig",
         "xcuserdata"

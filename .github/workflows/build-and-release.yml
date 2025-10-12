@@ -45,6 +45,8 @@ jobs:
   build-windows:
     name: Build Windows
     runs-on: windows-latest
+    env:
+      MISE_DISABLE_BACKENDS: vfox
     steps:
       - name: Checkout code with submodules
         uses: actions/checkout@v4
