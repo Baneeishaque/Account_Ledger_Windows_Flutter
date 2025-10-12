@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Extract hostname from the repository URL
-REPO_HOST=$(echo "$CONFIGURATION_REPO" | sed -E 's/^(https?|git)@?:\]\/\/([^\/]+)\/.*/\3/')
+REPO_HOST=$(echo "$CONFIGURATION_REPO" | sed -E 's/^(https?:\/\/(www\\.)?|git@)//; s/[:/].*//')
 
 GIT_CONFIG_URL_REWRITE=""
 
