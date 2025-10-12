@@ -1,5 +1,6 @@
-# Created by https://www.toptal.com/developers/gitignore/api/c,c++,git,dart,batch,cmake,linux,macos,gradle,kotlin,flutter,windows,intellij,powershell,visualstudiocode,dotenv
-# Edit at https://www.toptal.com/developers/gitignore?templates=c,c++,git,dart,batch,cmake,linux,macos,gradle,kotlin,flutter,windows,intellij,powershell,visualstudiocode,dotenv
+# File created using '.gitignore Generator' for Visual Studio Code: https://bit.ly/vscode-gig
+# Created by https://www.toptal.com/developers/gitignore/api/windows,visualstudiocode,powershell,macos,linux,kotlin,intellij,gradle,git,flutter,dotenv,dart,cmake,c++,c,batch
+# Edit at https://www.toptal.com/developers/gitignore?templates=windows,visualstudiocode,powershell,macos,linux,kotlin,intellij,gradle,git,flutter,dotenv,dart,cmake,c++,c,batch
 
 ### Batch ###
 # BatchFiles
@@ -93,6 +94,8 @@ CTestTestfile.cmake
 _deps
 
 ### CMake Patch ###
+CMakeUserPresets.json
+
 # External projects
 *-prefix/
 
@@ -472,8 +475,9 @@ gradle-app.setting
 # Java heap dump
 *.hprof
 
-# End of https://www.toptal.com/developers/gitignore/api/c,c++,git,dart,batch,cmake,linux,macos,gradle,kotlin,flutter,windows,intellij,powershell,visualstudiocode,dotenv
+# End of https://www.toptal.com/developers/gitignore/api/windows,visualstudiocode,powershell,macos,linux,kotlin,intellij,gradle,git,flutter,dotenv,dart,cmake,c++,c,batch
 
+# Custom rules (everything added below won't be overridden by 'Generate .gitignore File' if you use 'Update' option)
 relationOfAccounts.json
 frequencyOfAccounts.json
 api/http-client.env.json
