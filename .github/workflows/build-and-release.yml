@@ -29,6 +29,15 @@ jobs:
         name: Setup mise tool versions
         uses: jdx/mise-action@v2
 
+      - &clone_and_extract_env_step
+        name: Clone private configurations repository and extract .env
+        env:
+          CONFIGURATION_REPO: ${{ secrets.CONFIGURATION_REPO }}
+          CONFIGURATION_REPO_ACCESS_TOKEN: ${{ secrets.CONFIGURATION_REPO_ACCESS_TOKEN }}
+        run: |
+          chmod +x ./.github/scripts/clone-and-extract-env.bash
+          ./.github/scripts/clone-and-extract-env.bash
+
       - &kotlin_native_build_template
         name: Build Kotlin/Native Library for Linux
         working-directory: ./account_ledger_lib_kotlin_native
@@ -82,6 +91,8 @@ jobs:
       - <<: *kotlin_native_build_template
         name: Build Kotlin/Native Library for Windows
         run: ./gradlew.bat linkDebugSharedMingwX64
+
+      - *clone_and_extract_env_step
 
       - *flutter_pub_get_step
 
