@@ -751,7 +751,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void updateTransactionControllers() {
     String accountIdTextFieldLabelOffset = "";
 
-    List<RelationModel>? relationList = getAccountRelationList(
+    List<AccountRelationModel>? relationList = getAccountRelations(
         _accountLedgerGistV2.userId,
         _accountLedgerGistV2.accountLedgerPages[_currentAccountIndex].accountId,
         _accountLedgerGistV2
@@ -779,18 +779,18 @@ class _MyHomePageState extends State<MyHomePage> {
             .toString();
       }
     } else {
-      if (relationList.first.associatedAccountId.length > 1) {
+      if (relationList.first.associatedAccountIds.length > 1) {
         accountIdTextFieldLabelOffset =
-            "$accountIdTextFieldLabelOffset : [${relationList.first.indicator} - ${relationList.first.associatedAccountId.sublist(1)}]";
+            "$accountIdTextFieldLabelOffset : [${relationList.first.indicator} - ${relationList.first.associatedAccountIds.sublist(1)}]";
       }
       if (relationList.length > 1) {
         for (int i = 1; i < relationList.length; i++) {
           if (accountIdTextFieldLabelOffset.isEmpty) {
             accountIdTextFieldLabelOffset =
-                "$accountIdTextFieldLabelOffset : [${relationList[i].indicator} - ${relationList[i].associatedAccountId}]";
+                "$accountIdTextFieldLabelOffset : [${relationList[i].indicator} - ${relationList[i].associatedAccountIds}]";
           } else {
             accountIdTextFieldLabelOffset =
-                "$accountIdTextFieldLabelOffset, [${relationList[i].indicator} - ${relationList[i].associatedAccountId}]";
+                "$accountIdTextFieldLabelOffset, [${relationList[i].indicator} - ${relationList[i].associatedAccountIds}]";
           }
         }
       }
@@ -804,14 +804,14 @@ class _MyHomePageState extends State<MyHomePage> {
             .accountLedgerPages[_currentAccountIndex].accountId
             .toString();
         _secondAccountIdController.text =
-            relationList.first.associatedAccountId[0].toString();
+            relationList.first.associatedAccountIds[0].toString();
 
         _firstAccountIdTextFieldLabelText = "First Account ID";
         _secondAccountIdTextFieldLabelText =
             "Second A/C ID$accountIdTextFieldLabelOffset";
       } else {
         _firstAccountIdController.text =
-            relationList.first.associatedAccountId[0].toString();
+            relationList.first.associatedAccountIds[0].toString();
         _secondAccountIdController.text = _accountLedgerGistV2
             .accountLedgerPages[_currentAccountIndex].accountId
             .toString();
@@ -959,11 +959,9 @@ class _MyHomePageState extends State<MyHomePage> {
     AccountLedgerApiResultMessageModel accountLedgerApiResultMessage;
     if (dropdownValue == "Two-Way") {
       accountLedgerApiResultMessage =
-          runAccountLedgerInsertTwoWayTransactionOperationAsync(
+          runAccountLedgerInsertTwoWayTransactionOperation(
               TransactionModel(
-                u32(
-                  _accountLedgerGistV2.userId,
-                ),
+                _accountLedgerGistV2.userId,
                 _firstTransactionDateTimeController.text,
                 _firstTransactionParticularsController.text,
                 double.parse(
@@ -982,9 +980,9 @@ class _MyHomePageState extends State<MyHomePage> {
               ));
     } else if (dropdownValue == "1->2, 3->1") {
       accountLedgerApiResultMessage =
-          runAccountLedgerInsertOneTwoThreeOneTransactionOperationAsync(
+          runAccountLedgerInsertOneTwoThreeOneTransactionOperation(
               TransactionModel(
-                u32(_accountLedgerGistV2.userId),
+                _accountLedgerGistV2.userId,
                 _firstTransactionDateTimeController.text,
                 _firstTransactionParticularsController.text,
                 double.parse(
@@ -1006,9 +1004,9 @@ class _MyHomePageState extends State<MyHomePage> {
               ));
     } else if (dropdownValue == "1->2, 2->3 (Via.)") {
       accountLedgerApiResultMessage =
-          runAccountLedgerInsertOneTwoTwoThreeTransactionOperationAsync(
+          runAccountLedgerInsertOneTwoTwoThreeTransactionOperation(
               TransactionModel(
-                u32(_accountLedgerGistV2.userId),
+                _accountLedgerGistV2.userId,
                 _firstTransactionDateTimeController.text,
                 _firstTransactionParticularsController.text,
                 double.parse(
@@ -1030,9 +1028,9 @@ class _MyHomePageState extends State<MyHomePage> {
               ));
     } else if (dropdownValue == "1->2, 2->3, 3->4, 4->1") {
       accountLedgerApiResultMessage =
-          runAccountLedgerInsertOneTwoTwoThreeThreeFourFourOneTransactionOperationAsync(
+          runAccountLedgerInsertOneTwoTwoThreeThreeFourFourOneTransactionOperation(
               TransactionModel(
-                u32(_accountLedgerGistV2.userId),
+                _accountLedgerGistV2.userId,
                 _firstTransactionDateTimeController.text,
                 _firstTransactionParticularsController.text,
                 double.parse(
@@ -1065,9 +1063,9 @@ class _MyHomePageState extends State<MyHomePage> {
               ));
     } else if (dropdownValue == "1->2, 2->3, 3->4") {
       accountLedgerApiResultMessage =
-          runAccountLedgerInsertOneTwoTwoThreeThreeFourTransactionOperationAsync(
+          runAccountLedgerInsertOneTwoTwoThreeThreeFourTransactionOperation(
               TransactionModel(
-                u32(_accountLedgerGistV2.userId),
+                _accountLedgerGistV2.userId,
                 _firstTransactionDateTimeController.text,
                 _firstTransactionParticularsController.text,
                 double.parse(
@@ -1096,9 +1094,9 @@ class _MyHomePageState extends State<MyHomePage> {
               ));
     } else if (dropdownValue == "1->2, 2->3, 4->1") {
       accountLedgerApiResultMessage =
-          runAccountLedgerInsertOneTwoTwoThreeFourOneTransactionOperationAsync(
+          runAccountLedgerInsertOneTwoTwoThreeFourOneTransactionOperation(
               TransactionModel(
-                u32(_accountLedgerGistV2.userId),
+                _accountLedgerGistV2.userId,
                 _firstTransactionDateTimeController.text,
                 _firstTransactionParticularsController.text,
                 double.parse(
@@ -1130,7 +1128,7 @@ class _MyHomePageState extends State<MyHomePage> {
       accountLedgerApiResultMessage =
           runAccountLedgerInsertTransactionOperationWithTimeIncrementOnSuccess(
         TransactionModel(
-          u32(_accountLedgerGistV2.userId),
+          _accountLedgerGistV2.userId,
           _firstTransactionDateTimeController.text,
           _firstTransactionParticularsController.text,
           double.parse(
