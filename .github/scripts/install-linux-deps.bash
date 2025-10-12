@@ -23,7 +23,9 @@ sudo apt-get install -y \
     zip \
     libglu1-mesa \
     libstdc++-12-dev \
-    libupower-glib-dev
+    libupower-glib-dev \
+    libgstreamer1.0-dev \
+    gstreamer1.0-plugins-base
 
 echo "SUCCESS: All Linux dependencies installed."
 

@@ -61,6 +61,10 @@ jobs:
       - name: Setup mise tool versions
         uses: jdx/mise-action@v2
 
+      - name: Install and Setup mise tools
+        shell: powershell
+        run: ./.github/scripts/install-flutter-windows-workaround.ps1
+
       - name: Build Kotlin/Native Library for Windows
         working-directory: ./account_ledger_lib_kotlin_native
         run: ./gradlew.bat linkDebugSharedMingwX64
