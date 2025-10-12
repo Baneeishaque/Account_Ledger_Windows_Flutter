@@ -17,8 +17,8 @@ jobs:
 
       - name: Install Linux build dependencies
         run: |
-          chmod +x ./.github/scripts/install-linux-deps.sh
-          ./.github/scripts/install-linux-deps.sh
+          chmod +x ./.github/scripts/install-linux-deps.bash
+          ./.github/scripts/install-linux-deps.bash
 
       - name: Install jq
         uses: dcarbone/install-jq-action@v2.1.0
