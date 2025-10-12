@@ -4,11 +4,7 @@
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-# 1. Activate vfox for the current PowerShell session
-Write-Host "Activating vfox for PowerShell..."
-Invoke-Expression "$(vfox activate pwsh)"
-
-# 2. Read the flutter version dynamically from the root mise.toml file
+# 1. Read the flutter version dynamically from the root mise.toml file
 Write-Host "Reading flutter version from mise.toml..."
 $miseFile = "./mise.toml"
 $flutterLine = Get-Content $miseFile | Select-String -Pattern 'flutter = "(.*)"'
@@ -27,7 +23,11 @@ Write-Host "Installing Flutter $flutterVersion with vfox..."
 vfox install "flutter@$flutterVersion"
 
 Write-Host "Setting Flutter $flutterVersion as the active version..."
-vfox use "flutter@$flutterVersion"
+vfox use -g "flutter@$flutterVersion"
+
+# Activate vfox to ensure the environment is refreshed with the newly used Flutter version
+Write-Host "Re-activating vfox for PowerShell to refresh environment..."
+Invoke-Expression "$(vfox activate pwsh)"
 
 # 3. Verify the installation
 Write-Host "Verifying flutter installation..."
