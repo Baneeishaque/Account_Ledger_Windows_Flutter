@@ -45,6 +45,8 @@ jobs:
   build-windows:
     name: Build Windows
     runs-on: windows-latest
+    env:
+      MISE_DISABLE_BACKENDS: vfox
     steps:
       - name: Checkout code with submodules
         uses: actions/checkout@v4
@@ -58,12 +60,15 @@ jobs:
       - name: Install jq
         uses: dcarbone/install-jq-action@v2.1.0
 
-      - name: Setup mise tool versions
+      - name: Setup Java with mise
         uses: jdx/mise-action@v2
 
-      - name: Install and Setup mise tools
+      - name: Install vfox CLI
+        run: winget install vfox
+
+      - name: Install Flutter with vfox
         shell: powershell
-        run: ./.github/scripts/install-flutter-windows-workaround.ps1
+        run: ./.github/scripts/install-flutter-vfox.ps1
 
       - name: Build Kotlin/Native Library for Windows
         working-directory: ./account_ledger_lib_kotlin_native
