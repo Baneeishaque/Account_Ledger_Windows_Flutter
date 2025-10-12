@@ -63,8 +63,11 @@ jobs:
       - name: Setup Java with mise
         uses: jdx/mise-action@v2
 
-      - name: Install vfox CLI
-        run: winget install vfox
+      - name: Setup Scoop
+        uses: MinoruSekine/setup-scoop@v4
+
+      - name: Install vfox CLI via Scoop
+        run: scoop install vfox
 
       - name: Install Flutter with vfox
         shell: powershell

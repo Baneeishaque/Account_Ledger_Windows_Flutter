@@ -25,7 +25,8 @@ sudo apt-get install -y \
     libstdc++-12-dev \
     libupower-glib-dev \
     libgstreamer1.0-dev \
-    gstreamer1.0-plugins-base
+    gstreamer1.0-plugins-base \
+    libgstreamer-plugins-base1.0-dev
 
 echo "SUCCESS: All Linux dependencies installed."
 
