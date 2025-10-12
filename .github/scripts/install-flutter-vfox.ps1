@@ -22,6 +22,11 @@ Write-Host "Found flutter version: $flutterVersion"
 # 2. Use vfox to add and install Flutter
 Write-Host "Adding and installing Flutter with vfox..."
 vfox add flutter
+
+Write-Host "Installing Flutter $flutterVersion with vfox..."
+vfox install "flutter@$flutterVersion"
+
+Write-Host "Setting Flutter $flutterVersion as the active version..."
 vfox use "flutter@$flutterVersion"
 
 # 3. Verify the installation
