@@ -1,0 +1,12 @@
+name: 'Flutter App Build'
+description: 'Builds the Flutter application for the specified platform.'
+inputs:
+  platform_command:
+    description: 'The Flutter build command for the specific platform.'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: Build Flutter application
+      shell: bash
+      run: ${{ inputs.platform_command }}

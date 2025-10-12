@@ -1,0 +1,13 @@
+name: 'Kotlin/Native Build'
+description: 'Builds the Kotlin/Native library for the specified platform.'
+inputs:
+  platform_command:
+    description: 'The Gradle command to build for the specific platform.'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: Build Kotlin/Native Library
+      shell: bash
+      working-directory: ./account_ledger_lib_kotlin_native
+      run: ${{ inputs.platform_command }}

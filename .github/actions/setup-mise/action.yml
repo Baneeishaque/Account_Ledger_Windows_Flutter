@@ -1,0 +1,7 @@
+name: 'Setup Mise'
+description: 'Sets up mise tool versions.'
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup mise tool versions
+      uses: jdx/mise-action@v2

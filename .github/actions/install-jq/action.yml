@@ -1,0 +1,7 @@
+name: 'Install JQ'
+description: 'Installs the jq JSON processor.'
+runs:
+  using: 'composite'
+  steps:
+    - name: Install jq
+      uses: dcarbone/install-jq-action@v2.1.0

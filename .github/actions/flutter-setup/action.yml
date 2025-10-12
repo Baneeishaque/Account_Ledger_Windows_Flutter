@@ -1,0 +1,11 @@
+name: 'Flutter Setup'
+description: 'Installs Flutter dependencies and generates environment variables.'
+runs:
+  using: 'composite'
+  steps:
+    - name: Install Flutter dependencies
+      shell: bash
+      run: flutter pub get
+    - name: Generate environment variables
+      shell: bash
+      run: flutter pub run build_runner build --delete-conflicting-outputs

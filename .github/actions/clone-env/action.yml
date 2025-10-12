@@ -1,0 +1,20 @@
+name: 'Clone and Extract .env'
+description: 'Clones a private configurations repository and extracts the .env file.'
+inputs:
+  configuration_repo:
+    description: 'The URL of the private configurations repository.'
+    required: true
+  configuration_repo_access_token:
+    description: 'The access token for the private configurations repository.'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: Run clone and extract script
+      shell: bash
+      env:
+        CONFIGURATION_REPO: ${{ inputs.configuration_repo }}
+        CONFIGURATION_REPO_ACCESS_TOKEN: ${{ inputs.configuration_repo_access_token }}
+      run: |
+        chmod +x ./.github/scripts/clone-and-extract-env.bash
+        ./.github/scripts/clone-and-extract-env.bash

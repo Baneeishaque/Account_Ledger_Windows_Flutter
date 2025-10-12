@@ -10,9 +10,7 @@ jobs:
     name: Build Linux
     runs-on: ubuntu-latest
     steps:
-      - &checkout_code
-        name: Checkout code with submodules
-        uses: actions/checkout@v4
+      - uses: ./.github/actions/checkout-code
         with:
           submodules: 'recursive'
 
@@ -21,46 +19,29 @@ jobs:
           chmod +x ./.github/scripts/install-linux-deps.bash
           ./.github/scripts/install-linux-deps.bash
 
-      - &install_jq
-        name: Install jq
-        uses: dcarbone/install-jq-action@v2.1.0
+      - uses: ./.github/actions/install-jq
 
-      - &setup_mise
-        name: Setup mise tool versions
-        uses: jdx/mise-action@v2
+      - uses: ./.github/actions/setup-mise
 
-      - &clone_and_extract_env_step
-        name: Clone private configurations repository and extract .env
-        env:
-          CONFIGURATION_REPO: ${{ secrets.CONFIGURATION_REPO }}
-          CONFIGURATION_REPO_ACCESS_TOKEN: ${{ secrets.CONFIGURATION_REPO_ACCESS_TOKEN }}
-        run: |
-          chmod +x ./.github/scripts/clone-and-extract-env.bash
-          ./.github/scripts/clone-and-extract-env.bash
-
-      - &kotlin_native_build_template
-        name: Build Kotlin/Native Library for Linux
-        working-directory: ./account_ledger_lib_kotlin_native
-        run: ./gradlew linkDebugSharedLinuxX64
-
-      - &flutter_pub_get_step
-        name: Install Flutter dependencies
-        run: flutter pub get
-
-      - &flutter_generate_env_step
-        name: Generate environment variables
-        run: flutter pub run build_runner build --delete-conflicting-outputs
-
-      - &flutter_build_app_template
-        name: Build Linux application
-        run: flutter build linux --release
-
-      - &upload_artifact_template
-        name: Upload Linux build artifact
-        uses: actions/upload-artifact@v4
+      - uses: ./.github/actions/clone-env
         with:
-          name: linux-build
-          path: build/linux/x64/release/bundle
+          configuration_repo: ${{ secrets.CONFIGURATION_REPO }}
+          configuration_repo_access_token: ${{ secrets.CONFIGURATION_REPO_ACCESS_TOKEN }}
+
+      - uses: ./.github/actions/kotlin-native-build
+        with:
+          platform_command: ./gradlew linkDebugSharedLinuxX64
+
+      - uses: ./.github/actions/flutter-setup
+
+      - uses: ./.github/actions/flutter-app-build
+        with:
+          platform_command: flutter build linux --release
+
+      - uses: ./.github/actions/upload-artifact
+        with:
+          artifact_name: linux-build
+          artifact_path: build/linux/x64/release/bundle
 
   build-windows:
     name: Build Windows
@@ -68,15 +49,17 @@ jobs:
     env:
       MISE_DISABLE_BACKENDS: vfox
     steps:
-      - *checkout_code
+      - uses: ./.github/actions/checkout-code
+        with:
+          submodules: 'recursive'
 
       - name: Verify Visual Studio Environment
         shell: powershell
         run: ./.github/scripts/verify-vs-workload.ps1
 
-      - *install_jq
+      - uses: ./.github/actions/install-jq
 
-      - *setup_mise
+      - uses: ./.github/actions/setup-mise
 
       - name: Setup Scoop
         uses: MinoruSekine/setup-scoop@v4
@@ -88,22 +71,22 @@ jobs:
         shell: powershell
         run: ./.github/scripts/install-flutter-vfox.ps1
 
-      - <<: *kotlin_native_build_template
-        name: Build Kotlin/Native Library for Windows
-        run: ./gradlew.bat linkDebugSharedMingwX64
-
-      - *clone_and_extract_env_step
-
-      - *flutter_pub_get_step
-
-      - *flutter_generate_env_step
-
-      - <<: *flutter_build_app_template
-        name: Build Windows application
-        run: flutter build windows --release
-
-      - <<: *upload_artifact_template
-        name: Upload Windows build artifact
+      - uses: ./.github/actions/clone-env
         with:
-          name: windows-build
-          path: build/windows/runner/Release
+          configuration_repo: ${{ secrets.CONFIGURATION_REPO }}
+          configuration_repo_access_token: ${{ secrets.CONFIGURATION_REPO_ACCESS_TOKEN }}
+
+      - uses: ./.github/actions/kotlin-native-build
+        with:
+          platform_command: ./gradlew.bat linkDebugSharedMingwX64
+
+      - uses: ./.github/actions/flutter-setup
+
+      - uses: ./.github/actions/flutter-app-build
+        with:
+          platform_command: flutter build windows --release
+
+      - uses: ./.github/actions/upload-artifact
+        with:
+          artifact_name: windows-build
+          artifact_path: build/windows/runner/Release
