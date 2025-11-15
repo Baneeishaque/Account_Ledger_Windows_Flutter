@@ -75,16 +75,31 @@ bool FlutterWindow::OnCreate() {
 
                 account_ledger_lib_ExportedSymbols *lib = account_ledger_lib_symbols();
 
-                // Call the static getGistContentAsText method from GistUtilsNative
-                const char* accountLedgerGistText = lib->kotlin.root.account_ledger_library.utils.GistUtilsNative.Companion.get()->getGistContentAsText(
+                // Get HTTP client for GitHub API
+                account_ledger_lib_kref_io_ktor_client_HttpClient httpClient = lib->kotlin.root.common_utils_library.utils.GistUtilsCommonNative.getHttpClientForGitHub(
                     (static_cast<string> (std::get<string>(argsList->find(flutter::EncodableValue("GITHUB_ACCESS_TOKEN"))->second))).data(),
+                    false
+                );
+
+                // Get Gist contents
+                account_ledger_lib_kref_common_utils_library_models_Root gistRoot = lib->kotlin.root.common_utils_library.utils.GistUtilsInteractiveCommonNative.getGistContents(
+                    httpClient,
                     (static_cast<string> (std::get<string>(argsList->find(flutter::EncodableValue("GIST_ID"))->second))).data(),
                     false
                 );
 
+                // Access the content string from the Root object
+                account_ledger_lib_kref_common_utils_library_models_Files files = lib->kotlin.root.common_utils_library.models.Root.get_files(gistRoot);
+                account_ledger_lib_kref_common_utils_library_models_MainTxt mainTxt = lib->kotlin.root.common_utils_library.models.Files.get_mainTxt(files);
+                const char* accountLedgerGistText = lib->kotlin.root.common_utils_library.models.MainTxt.get_content(mainTxt);
+
                 result->Success(string(accountLedgerGistText));
 
-                lib->DisposeString(accountLedgerGistText);
+                // Clean up
+                lib->DisposeStablePointer(httpClient.pinned);
+                lib->DisposeStablePointer(gistRoot.pinned);
+                lib->DisposeStablePointer(files.pinned);
+                lib->DisposeStablePointer(mainTxt.pinned);
 
               } else {
                   result->NotImplemented();
