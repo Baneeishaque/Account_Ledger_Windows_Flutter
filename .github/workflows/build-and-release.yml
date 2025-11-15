@@ -113,7 +113,7 @@ jobs:
 
       - uses: ./.github/actions/kotlin-native-build
         with:
-          platform_command: ./gradlew linkDebugSharedMacosArm64
+          platform_command: ./gradlew linkReleaseSharedMacosArm64
 
       - uses: ./.github/actions/flutter-setup
 
