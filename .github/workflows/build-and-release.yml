@@ -23,10 +23,6 @@ jobs:
 
       - uses: ./.github/actions/setup-mise
 
-      - name: Install aqua packages
-        shell: bash
-        run: aqua install --all
-
       - uses: ./.github/actions/clone-env
         with:
           configuration_repo: ${{ secrets.CONFIGURATION_REPO }}
@@ -62,10 +58,6 @@ jobs:
       # - uses: ./.github/actions/install-jq
 
       - uses: ./.github/actions/setup-mise
-
-      - name: Install aqua packages
-        shell: bash
-        run: aqua install --all
 
       - uses: ./.github/actions/clone-env
         with:

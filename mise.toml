@@ -1,4 +1,5 @@
 [tools]
-# aqua is used to manage Flutter via the aqua registry
-aqua = "latest"
+# Flutter via mise's aqua backend
+# https://mise.jdx.dev/dev-tools/backends/aqua.html
+"aqua:flutter/flutter" = "3.19.6"
 java = "zulu-21"

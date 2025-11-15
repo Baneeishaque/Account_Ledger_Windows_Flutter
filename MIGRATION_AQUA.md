@@ -52,28 +52,13 @@ java = "zulu-21"
 **mise.toml - After:**
 ```toml
 [tools]
-# aqua is used to manage Flutter via the aqua registry
-aqua = "latest"
+# Flutter via mise's aqua backend
+# https://mise.jdx.dev/dev-tools/backends/aqua.html
+"aqua:flutter/flutter" = "3.19.6"
 java = "zulu-21"
 ```
 
-**aqua.yaml - New File:**
-```yaml
-# aqua - Declarative CLI Version Manager
-# This file manages Flutter installation via aqua for cross-platform consistency
----
-registries:
-  - type: standard
-    ref: v4.238.0
-
-packages:
-  - name: flutter/flutter@3.19.6
-```
-
 ### 2. CI Workflow Changes
-
-**Added Steps (Both Linux and Windows):**
-- Install aqua packages step after mise setup: `aqua install --all`
 
 **Windows - Removed Steps:**
 - `MISE_DISABLE_BACKENDS: vfox` environment variable
@@ -95,15 +80,14 @@ Added comprehensive documentation to README.md:
 ## Compatibility
 
 - ✅ **Flutter Version**: Maintained at 3.19.6 (no breaking changes)
-- ✅ **Linux Builds**: Already used mise (added aqua installation step)
+- ✅ **Linux Builds**: Already used mise (no workflow changes)
 - ✅ **Windows Builds**: Simplified (removed vfox dependency)
-- ✅ **Developer Workflow**: Improved (`mise install` + `aqua install --all`)
+- ✅ **Developer Workflow**: Improved (single `mise install` command)
 
 ## Files Affected
 
-- `mise.toml` - Changed from direct Flutter to aqua tool
-- `aqua.yaml` - New file for aqua package configuration
-- `.github/workflows/build-and-release.yml` - Added aqua install step, removed Windows vfox workarounds
+- `mise.toml` - Changed from direct Flutter to aqua backend syntax
+- `.github/workflows/build-and-release.yml` - Removed Windows vfox workarounds
 - `README.md` - Added setup documentation
 - `MIGRATION_AQUA.md` - This migration guide
 - `.github/scripts/install-flutter-vfox.ps1` - Retained but no longer used
@@ -114,10 +98,9 @@ Added comprehensive documentation to README.md:
 
 1. Install mise following the [official guide](https://mise.jdx.dev/getting-started.html)
 2. Clone the repository: `git clone --recursive https://github.com/Baneeishaque/Account_Ledger_Windows_Flutter.git`
-3. Install mise tools: `mise install`
-4. Install aqua packages: `aqua install --all`
-5. Setup Flutter: `flutter pub get`
-6. Generate code: `dart run build_runner build --delete-conflicting-outputs`
+3. Install project tools: `mise install`
+4. Setup Flutter: `flutter pub get`
+5. Generate code: `dart run build_runner build --delete-conflicting-outputs`
 
 ### For Existing Contributors
 
@@ -125,21 +108,17 @@ If you were using the previous setup:
 
 1. Ensure you have mise installed
 2. Pull the latest changes
-3. Run `mise install` to install aqua
-4. Run `aqua install --all` to install Flutter
-5. Remove any manual Flutter installations if desired (optional)
-6. Continue with normal development workflow
+3. Run `mise install` to install Flutter via aqua backend
+4. Remove any manual Flutter installations if desired (optional)
+5. Continue with normal development workflow
 
 ## Rollback Plan
 
 If issues arise with the aqua integration, rollback steps:
 
 1. Revert `mise.toml` to use direct Flutter backend: `flutter = "3.19.6"`
-2. Remove `aqua = "latest"` from `mise.toml`
-3. Delete `aqua.yaml` file
-4. Remove `aqua install --all` steps from `.github/workflows/build-and-release.yml`
-5. For Windows, restore vfox installation steps in the workflow
-6. Re-enable `MISE_DISABLE_BACKENDS: vfox` environment variable
+2. For Windows, restore vfox installation steps in the workflow
+3. Re-enable `MISE_DISABLE_BACKENDS: vfox` environment variable
 
 The vfox script (`.github/scripts/install-flutter-vfox.ps1`) has been retained to facilitate rollback if needed.
 
@@ -154,11 +133,12 @@ The integration will be validated through:
 
 - [aqua Flutter Registry](https://github.com/aquaproj/aqua-registry/tree/main/pkgs/flutter/flutter)
 - [mise Documentation](https://mise.jdx.dev/)
+- [mise aqua Backend Documentation](https://mise.jdx.dev/dev-tools/backends/aqua.html)
 - [aqua Documentation](https://aquaproj.github.io/)
 
 ## Conclusion
 
-The integration of Flutter via aqua using mise has been successfully implemented. This change:
+The integration of Flutter via mise's aqua backend has been successfully implemented. This change:
 - Simplifies the development setup
 - Improves cross-platform consistency
 - Reduces maintenance burden
