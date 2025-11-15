@@ -32,6 +32,24 @@ jobs:
           configuration_repo: ${{ secrets.CONFIGURATION_REPO }}
           configuration_repo_access_token: ${{ secrets.CONFIGURATION_REPO_ACCESS_TOKEN }}
 
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Cache Kotlin/Native Konan
+        uses: actions/cache@v4
+        with:
+          path: ~/.konan
+          key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-konan-
+
       - uses: ./.github/actions/kotlin-native-build
         with:
           platform_command: ./gradlew linkDebugSharedLinuxX64
@@ -95,6 +113,24 @@ jobs:
         with:
           configuration_repo: ${{ secrets.CONFIGURATION_REPO }}
           configuration_repo_access_token: ${{ secrets.CONFIGURATION_REPO_ACCESS_TOKEN }}
+
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Cache Kotlin/Native Konan
+        uses: actions/cache@v4
+        with:
+          path: ~/.konan
+          key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-konan-
 
       - uses: ./.github/actions/kotlin-native-build
         with:
