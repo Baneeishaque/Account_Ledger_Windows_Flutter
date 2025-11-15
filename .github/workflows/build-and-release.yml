@@ -14,7 +14,8 @@ jobs:
     name: Build Linux
     runs-on: ubuntu-latest
     # Skip push events for automated tool branches (they're always associated with PRs)
-    if: github.event_name != 'push' || (!startsWith(github.ref, 'refs/heads/copilot/') && !startsWith(github.ref, 'refs/heads/renovate/') && !startsWith(github.ref, 'refs/heads/coderabbitai/'))
+    # Exception: Allow copilot branches to build on push events
+    if: github.event_name != 'push' || (!startsWith(github.ref, 'refs/heads/renovate/') && !startsWith(github.ref, 'refs/heads/coderabbitai/'))
     steps:
       - uses: actions/checkout@v4
         with:
@@ -71,7 +72,8 @@ jobs:
     name: Build Windows
     runs-on: windows-latest
     # Skip push events for automated tool branches (they're always associated with PRs)
-    if: github.event_name != 'push' || (!startsWith(github.ref, 'refs/heads/copilot/') && !startsWith(github.ref, 'refs/heads/renovate/') && !startsWith(github.ref, 'refs/heads/coderabbitai/'))
+    # Exception: Allow copilot branches to build on push events
+    if: github.event_name != 'push' || (!startsWith(github.ref, 'refs/heads/renovate/') && !startsWith(github.ref, 'refs/heads/coderabbitai/'))
     env:
       MISE_DISABLE_BACKENDS: vfox
     steps:
