@@ -4,16 +4,21 @@
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-# 1. Read the flutter version dynamically from the root mise.toml file
-Write-Host "Reading flutter version from mise.toml..."
-$miseFile = "./mise.toml"
-$flutterLine = Get-Content $miseFile | Select-String -Pattern 'flutter = "(.*)"'
-if (-not $flutterLine) {
-    Write-Error "Could not find flutter version in $miseFile"
-    exit 1
+# 1. Get flutter version from environment variable (set in workflow) or fallback to mise.toml
+if ($env:FLUTTER_VERSION) {
+    $flutterVersion = $env:FLUTTER_VERSION
+    Write-Host "Using Flutter version from environment: $flutterVersion"
+} else {
+    Write-Host "Reading flutter version from mise.toml..."
+    $miseFile = "./mise.toml"
+    $flutterLine = Get-Content $miseFile | Select-String -Pattern 'flutter = "(.*)"'
+    if (-not $flutterLine) {
+        Write-Error "Could not find flutter version in $miseFile or environment variable"
+        exit 1
+    }
+    $flutterVersion = $flutterLine.Matches[0].Groups[1].Value
+    Write-Host "Found flutter version: $flutterVersion"
 }
-$flutterVersion = $flutterLine.Matches[0].Groups[1].Value
-Write-Host "Found flutter version: $flutterVersion"
 
 # 2. Use vfox to add and install Flutter
 Write-Host "Adding and installing Flutter with vfox..."

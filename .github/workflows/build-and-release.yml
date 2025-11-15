@@ -63,6 +63,22 @@ jobs:
 
       # - uses: ./.github/actions/install-jq
 
+      - name: Workaround - Temporarily remove Flutter from mise.toml (Windows only)
+        shell: powershell
+        run: |
+          # Read mise.toml and extract Flutter version
+          $content = Get-Content mise.toml -Raw
+          if ($content -match 'flutter\s*=\s*"([^"]+)"') {
+            $flutterVersion = $matches[1]
+            Write-Output "FLUTTER_VERSION=$flutterVersion" >> $env:GITHUB_ENV
+            Write-Host "Extracted Flutter version: $flutterVersion"
+          }
+          # Remove Flutter line from mise.toml for mise install
+          (Get-Content mise.toml) | Where-Object { $_ -notmatch '^flutter\s*=' } | Set-Content mise.toml.tmp
+          Move-Item -Force mise.toml.tmp mise.toml
+          Write-Host "Temporarily removed Flutter from mise.toml"
+          Get-Content mise.toml
+
       - uses: ./.github/actions/setup-mise
 
       - name: Setup Scoop
