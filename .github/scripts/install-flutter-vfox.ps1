@@ -38,4 +38,11 @@ Invoke-Expression "$(vfox activate pwsh)"
 Write-Host "Verifying flutter installation..."
 flutter --version
 
+# 4. Add Flutter to GITHUB_PATH so it's available in subsequent steps
+Write-Host "Adding Flutter to GITHUB_PATH..."
+$flutterPath = (Get-Command flutter).Source | Split-Path
+Write-Host "Flutter bin path: $flutterPath"
+Add-Content -Path $env:GITHUB_PATH -Value $flutterPath
+Write-Host "Flutter added to GITHUB_PATH"
+
 Write-Host "SUCCESS: Flutter installation via vfox complete."
