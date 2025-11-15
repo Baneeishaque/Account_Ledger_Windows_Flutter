@@ -1,6 +1,8 @@
 #include "my_application.h"
 #include <math.h>
 #include <upower.h>
+#include <unistd.h>
+#include <stdio.h>
 
 #include <flutter_linux/flutter_linux.h>
 #ifdef GDK_WINDOWING_X11
@@ -52,10 +54,41 @@ static void battery_method_call_handler(FlMethodChannel* channel,
     libaccount_ledger_lib_kref_account_ledger_library_utils_GistUtilsInteractiveNative newInstance = lib->kotlin.root.account_ledger_library.utils.GistUtilsInteractiveNative.GistUtilsInteractiveNative();
     libaccount_ledger_lib_kref_kotlin_Function3 dummyFunction;
     dummyFunction.pinned = nullptr;
-    const char *accountLedgerGistText = lib->kotlin.root.account_ledger_library.utils.GistUtilsInteractiveNative.processGistIdForDataV3(newInstance, fl_value_get_string(fl_value_lookup_string(argsList, "USERNAME")), 0, fl_value_get_string(fl_value_lookup_string(argsList, "GITHUB_ACCESS_TOKEN")), fl_value_get_string(fl_value_lookup_string(argsList, "GIST_ID")), false, false, false, dummyFunction);
+    
+    // Redirect stdout to capture the JSON output
+    int stdout_bk = dup(fileno(stdout));
+    int pipefd[2];
+    pipe(pipefd);
+    dup2(pipefd[1], fileno(stdout));
+    
+    // Call the function with isApiCall=true to print JSON
+    libaccount_ledger_lib_kref_account_ledger_library_models_AccountLedgerGistModelV3 result = lib->kotlin.root.account_ledger_library.utils.GistUtilsInteractiveNative.processGistIdForDataV3(newInstance, fl_value_get_string(fl_value_lookup_string(argsList, "USERNAME")), 0, fl_value_get_string(fl_value_lookup_string(argsList, "GITHUB_ACCESS_TOKEN")), fl_value_get_string(fl_value_lookup_string(argsList, "GIST_ID")), false, true, false, dummyFunction);
+    
+    // Restore stdout
+    fflush(stdout);
+    dup2(stdout_bk, fileno(stdout));
+    close(pipefd[1]);
+    close(stdout_bk);
+    
+    // Read captured output
+    char buffer[65536];
+    ssize_t count = read(pipefd[0], buffer, sizeof(buffer) - 1);
+    close(pipefd[0]);
+    
+    if (count > 0) {
+      buffer[count] = '\0';
+      // Remove trailing newline if present
+      if (count > 0 && buffer[count - 1] == '\n') {
+        buffer[count - 1] = '\0';
+      }
+    } else {
+      buffer[0] = '\0';
+    }
+    
     lib->DisposeStablePointer(newInstance.pinned);
+    lib->DisposeStablePointer(result.pinned);
 
-    response = FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_string(accountLedgerGistText)));
+    response = FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_string(buffer)));
 
   } else {
     response = FL_METHOD_RESPONSE(fl_method_not_implemented_response_new());
