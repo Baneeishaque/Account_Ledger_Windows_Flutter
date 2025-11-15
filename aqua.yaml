@@ -1,0 +1,12 @@
+# aqua - Declarative CLI Version Manager
+# https://aquaproj.github.io/
+# This file manages Flutter installation via aqua for cross-platform consistency
+---
+registries:
+  - type: standard
+    ref: v4.238.0 # Renovate will update this
+
+packages:
+  # Flutter SDK
+  # https://github.com/aquaproj/aqua-registry/tree/main/pkgs/flutter/flutter
+  - name: flutter/flutter@3.19.6

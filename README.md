@@ -18,18 +18,24 @@ This project uses [mise](https://mise.jdx.dev/) for managing tool versions, incl
    cd Account_Ledger_Windows_Flutter
    ```
 
-2. Install project dependencies (Flutter, Java, etc.):
+2. Install project dependencies (aqua, Java, etc.):
    ```bash
    mise install
    ```
-   This will automatically install Flutter via aqua and other required tools as specified in `mise.toml`.
+   This will install aqua and other required tools as specified in `mise.toml`.
 
-3. Install Flutter dependencies:
+3. Install aqua packages (Flutter):
+   ```bash
+   aqua install --all
+   ```
+   This will install Flutter as specified in `aqua.yaml`.
+
+4. Install Flutter dependencies:
    ```bash
    flutter pub get
    ```
 
-4. Generate environment variables:
+5. Generate environment variables:
    ```bash
    dart run build_runner build --delete-conflicting-outputs
    ```
@@ -38,17 +44,17 @@ This project uses [mise](https://mise.jdx.dev/) for managing tool versions, incl
 
 This project uses Flutter via aqua through mise, which provides:
 - **Cross-platform consistency**: Same setup works on Linux, macOS, and Windows
-- **Version pinning**: Exact Flutter version specified in `mise.toml`
-- **Easy upgrades**: Update version in one place (`mise.toml`)
+- **Version pinning**: Exact Flutter version specified in `aqua.yaml`
+- **Easy upgrades**: Update version in one place (`aqua.yaml`)
 - **Better CI/CD integration**: Simplified workflows without platform-specific workarounds
 
-The Flutter version is managed in `mise.toml`:
-```toml
-[tools]
-flutter = "aqua:flutter/flutter@3.19.6"
+The Flutter version is managed in `aqua.yaml`:
+```yaml
+packages:
+  - name: flutter/flutter@3.19.6
 ```
 
-To upgrade Flutter, update the version in `mise.toml` and run `mise install`.
+To upgrade Flutter, update the version in `aqua.yaml` and run `aqua install --all`.
 
 ### Building
 

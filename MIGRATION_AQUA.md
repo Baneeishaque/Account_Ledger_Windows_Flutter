@@ -40,34 +40,49 @@ This document describes the migration from platform-specific Flutter installatio
 
 ## Changes Made
 
-### 1. mise.toml Configuration
+### 1. Configuration Files
 
-**Before:**
+**mise.toml - Before:**
 ```toml
 [tools]
 flutter = "3.19.6"
 java = "zulu-21"
 ```
 
-**After:**
+**mise.toml - After:**
 ```toml
 [tools]
-# Flutter via aqua for better cross-platform version management
-# See: https://github.com/aquaproj/aqua-registry/tree/main/pkgs/flutter/flutter
-flutter = "aqua:flutter/flutter@3.19.6"
+# aqua is used to manage Flutter via the aqua registry
+aqua = "latest"
 java = "zulu-21"
 ```
 
-### 2. CI Workflow Changes (Windows)
+**aqua.yaml - New File:**
+```yaml
+# aqua - Declarative CLI Version Manager
+# This file manages Flutter installation via aqua for cross-platform consistency
+---
+registries:
+  - type: standard
+    ref: v4.238.0
 
-**Removed Steps:**
+packages:
+  - name: flutter/flutter@3.19.6
+```
+
+### 2. CI Workflow Changes
+
+**Added Steps (Both Linux and Windows):**
+- Install aqua packages step after mise setup: `aqua install --all`
+
+**Windows - Removed Steps:**
 - `MISE_DISABLE_BACKENDS: vfox` environment variable
 - Scoop installation
 - vfox CLI installation
 - Custom PowerShell script for Flutter installation
 
 **Result:**
-Windows builds now use the same mise-based approach as Linux builds, with Flutter installed via aqua backend.
+Both Linux and Windows builds now use the same workflow: mise installs aqua, then aqua installs Flutter.
 
 ### 3. Documentation Updates
 
@@ -80,15 +95,17 @@ Added comprehensive documentation to README.md:
 ## Compatibility
 
 - ✅ **Flutter Version**: Maintained at 3.19.6 (no breaking changes)
-- ✅ **Linux Builds**: Already used mise (no changes to build process)
+- ✅ **Linux Builds**: Already used mise (added aqua installation step)
 - ✅ **Windows Builds**: Simplified (removed vfox dependency)
-- ✅ **Developer Workflow**: Improved (single `mise install` command)
+- ✅ **Developer Workflow**: Improved (`mise install` + `aqua install --all`)
 
 ## Files Affected
 
-- `mise.toml` - Updated Flutter backend configuration
-- `.github/workflows/build-and-release.yml` - Removed Windows-specific workarounds
+- `mise.toml` - Changed from direct Flutter to aqua tool
+- `aqua.yaml` - New file for aqua package configuration
+- `.github/workflows/build-and-release.yml` - Added aqua install step, removed Windows vfox workarounds
 - `README.md` - Added setup documentation
+- `MIGRATION_AQUA.md` - This migration guide
 - `.github/scripts/install-flutter-vfox.ps1` - Retained but no longer used
 
 ## Migration Guide for Developers
@@ -97,9 +114,10 @@ Added comprehensive documentation to README.md:
 
 1. Install mise following the [official guide](https://mise.jdx.dev/getting-started.html)
 2. Clone the repository: `git clone --recursive https://github.com/Baneeishaque/Account_Ledger_Windows_Flutter.git`
-3. Install dependencies: `mise install`
-4. Setup Flutter: `flutter pub get`
-5. Generate code: `dart run build_runner build --delete-conflicting-outputs`
+3. Install mise tools: `mise install`
+4. Install aqua packages: `aqua install --all`
+5. Setup Flutter: `flutter pub get`
+6. Generate code: `dart run build_runner build --delete-conflicting-outputs`
 
 ### For Existing Contributors
 
@@ -107,17 +125,21 @@ If you were using the previous setup:
 
 1. Ensure you have mise installed
 2. Pull the latest changes
-3. Run `mise install` to install Flutter via aqua
-4. Remove any manual Flutter installations if desired (optional)
-5. Continue with normal development workflow
+3. Run `mise install` to install aqua
+4. Run `aqua install --all` to install Flutter
+5. Remove any manual Flutter installations if desired (optional)
+6. Continue with normal development workflow
 
 ## Rollback Plan
 
 If issues arise with the aqua integration, rollback steps:
 
 1. Revert `mise.toml` to use direct Flutter backend: `flutter = "3.19.6"`
-2. For Windows, restore vfox installation steps in `.github/workflows/build-and-release.yml`
-3. Re-enable `MISE_DISABLE_BACKENDS: vfox` environment variable
+2. Remove `aqua = "latest"` from `mise.toml`
+3. Delete `aqua.yaml` file
+4. Remove `aqua install --all` steps from `.github/workflows/build-and-release.yml`
+5. For Windows, restore vfox installation steps in the workflow
+6. Re-enable `MISE_DISABLE_BACKENDS: vfox` environment variable
 
 The vfox script (`.github/scripts/install-flutter-vfox.ps1`) has been retained to facilitate rollback if needed.
 
