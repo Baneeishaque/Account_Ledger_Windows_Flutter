@@ -1,3 +1,5 @@
 [tools]
-flutter = "3.19.6"
+# Flutter via aqua for better cross-platform version management
+# See: https://github.com/aquaproj/aqua-registry/tree/main/pkgs/flutter/flutter
+flutter = "aqua:flutter/flutter@3.19.6"
 java = "zulu-21"
