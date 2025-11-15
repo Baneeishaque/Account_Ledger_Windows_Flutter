@@ -88,7 +88,7 @@
             libaccount_ledger_lib_kref_kotlin_Function3 dummyFunction;
             dummyFunction.pinned = nullptr;
             
-            const char *accountLedgerGistText = lib->kotlin.root.account_ledger_library.utils.GistUtilsInteractiveNative.processGistIdForDataV3(
+            libaccount_ledger_lib_kref_account_ledger_library_models_AccountLedgerGistModelV3 gistModel = lib->kotlin.root.account_ledger_library.utils.GistUtilsInteractiveNative.processGistIdForDataV3(
                 newInstance, 
                 [username UTF8String], 
                 0, 
@@ -100,10 +100,12 @@
                 dummyFunction
             );
             
+            const char *accountLedgerGistText = lib->kotlin.root.account_ledger_library.models.AccountLedgerGistModelV3.get_text(gistModel);
+            
             NSString* resultString = [NSString stringWithUTF8String:accountLedgerGistText];
             
-            // Free Kotlin-allocated string
-            lib->DisposeString(accountLedgerGistText);
+            // Free Kotlin-allocated resources
+            lib->DisposeStablePointer(gistModel.pinned);
             lib->DisposeStablePointer(newInstance.pinned);
             
             result(resultString);
