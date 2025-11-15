@@ -75,14 +75,20 @@ bool FlutterWindow::OnCreate() {
 
                 account_ledger_lib_ExportedSymbols *lib = account_ledger_lib_symbols();
 
+                // Get singleton instances for Kotlin objects
+                account_ledger_lib_kref_common_utils_library_utils_GistUtilsCommonNative gistUtilsCommon = lib->kotlin.root.common_utils_library.utils.GistUtilsCommonNative._instance();
+                account_ledger_lib_kref_common_utils_library_utils_GistUtilsInteractiveCommonNative gistUtilsInteractive = lib->kotlin.root.common_utils_library.utils.GistUtilsInteractiveCommonNative._instance();
+
                 // Get HTTP client for GitHub API
                 account_ledger_lib_kref_io_ktor_client_HttpClient httpClient = lib->kotlin.root.common_utils_library.utils.GistUtilsCommonNative.getHttpClientForGitHub(
+                    gistUtilsCommon,
                     (static_cast<string> (std::get<string>(argsList->find(flutter::EncodableValue("GITHUB_ACCESS_TOKEN"))->second))).data(),
                     false
                 );
 
                 // Get Gist contents
                 account_ledger_lib_kref_common_utils_library_models_Root gistRoot = lib->kotlin.root.common_utils_library.utils.GistUtilsInteractiveCommonNative.getGistContents(
+                    gistUtilsInteractive,
                     httpClient,
                     (static_cast<string> (std::get<string>(argsList->find(flutter::EncodableValue("GIST_ID"))->second))).data(),
                     false
@@ -96,6 +102,8 @@ bool FlutterWindow::OnCreate() {
                 result->Success(string(accountLedgerGistText));
 
                 // Clean up
+                lib->DisposeStablePointer(gistUtilsCommon.pinned);
+                lib->DisposeStablePointer(gistUtilsInteractive.pinned);
                 lib->DisposeStablePointer(httpClient.pinned);
                 lib->DisposeStablePointer(gistRoot.pinned);
                 lib->DisposeStablePointer(files.pinned);
