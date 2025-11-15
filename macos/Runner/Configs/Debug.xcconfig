@@ -2,8 +2,8 @@
 #include "Warnings.xcconfig"
 
 // Kotlin Native Library - Architecture mapping
-KOTLIN_ARCH[arch=arm64] = Arm64
-KOTLIN_ARCH[arch=x86_64] = X64
-OTHER_LDFLAGS = $(inherited) -framework IOKit "$(PROJECT_DIR)/../account_ledger_lib_kotlin_native/lib/build/bin/macos$(KOTLIN_ARCH)/debugShared/libaccount_ledger_lib.dylib"
-HEADER_SEARCH_PATHS = $(inherited) "$(PROJECT_DIR)/../account_ledger_lib_kotlin_native/lib/build/bin/macos$(KOTLIN_ARCH)/debugShared"
+KOTLIN_TARGET[arch=arm64] = macosArm64
+KOTLIN_TARGET[arch=x86_64] = macosX64
+OTHER_LDFLAGS = $(inherited) -framework IOKit "$(PROJECT_DIR)/../account_ledger_lib_kotlin_native/lib/build/bin/$(KOTLIN_TARGET)/debugShared/libaccount_ledger_lib.dylib"
+HEADER_SEARCH_PATHS = $(inherited) "$(PROJECT_DIR)/../account_ledger_lib_kotlin_native/lib/build/bin/$(KOTLIN_TARGET)/debugShared"
 SWIFT_OBJC_BRIDGING_HEADER = Runner/Runner-Bridging-Header.h
