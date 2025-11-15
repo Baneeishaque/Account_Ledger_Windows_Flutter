@@ -75,11 +75,16 @@ bool FlutterWindow::OnCreate() {
 
                 account_ledger_lib_ExportedSymbols *lib = account_ledger_lib_symbols();
 
-                account_ledger_lib_kref_account_ledger_library_utils_GistUtils newInstance = lib->kotlin.root.account_ledger_library.utils.GistUtils.GistUtils();
-                string accountLedgerGistText = lib->kotlin.root.account_ledger_library.utils.GistUtils.processGistIdForTextData(newInstance, (static_cast<string> (std::get<string>(argsList->find(flutter::EncodableValue("USERNAME"))->second))).data(), 0, (static_cast<string> (std::get<string>(argsList->find(flutter::EncodableValue("GITHUB_ACCESS_TOKEN"))->second))).data(), (static_cast<string> (std::get<string>(argsList->find(flutter::EncodableValue("GIST_ID"))->second))).data(), false, false);
-                lib->DisposeStablePointer(newInstance.pinned);
+                // Call the static getGistContentAsText method from GistUtilsNative
+                const char* accountLedgerGistText = lib->kotlin.root.account_ledger_library.utils.GistUtilsNative.Companion.get()->getGistContentAsText(
+                    (static_cast<string> (std::get<string>(argsList->find(flutter::EncodableValue("GITHUB_ACCESS_TOKEN"))->second))).data(),
+                    (static_cast<string> (std::get<string>(argsList->find(flutter::EncodableValue("GIST_ID"))->second))).data(),
+                    false
+                );
 
-                result->Success(accountLedgerGistText);
+                result->Success(string(accountLedgerGistText));
+
+                lib->DisposeString(accountLedgerGistText);
 
               } else {
                   result->NotImplemented();
