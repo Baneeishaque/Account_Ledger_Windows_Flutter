@@ -9,6 +9,9 @@ class MainFlutterWindow: NSWindow {
     self.setFrame(windowFrame, display: true)
 
     RegisterGeneratedPlugins(registry: flutterViewController)
+    
+    // Register method channel with Kotlin bridge
+    KotlinBridge.registerMethodChannel(with: flutterViewController.engine.binaryMessenger)
 
     super.awakeFromNib()
   }
