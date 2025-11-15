@@ -100,7 +100,7 @@
                 dummyFunction
             );
             
-            const char *accountLedgerGistText = lib->kotlin.root.account_ledger_library.models.AccountLedgerGistModelV3.get_text(gistModel);
+            const char *accountLedgerGistText = lib->kotlin.root.account_ledger_library.models.AccountLedgerGistModelV3._text.getter(gistModel);
             
             NSString* resultString = [NSString stringWithUTF8String:accountLedgerGistText];
             
