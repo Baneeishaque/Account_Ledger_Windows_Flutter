@@ -483,3 +483,4 @@ frequencyOfAccounts.json
 api/http-client.env.json
 
 lib/env/env.g.dart
+_codeql_detected_source_root
