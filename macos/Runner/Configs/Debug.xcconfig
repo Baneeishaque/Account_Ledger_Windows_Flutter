@@ -2,5 +2,5 @@
 #include "Warnings.xcconfig"
 
 // Kotlin Native Library
-OTHER_LDFLAGS = $(inherited) -framework IOKit "$(PROJECT_DIR)/../account_ledger_lib_kotlin_native/lib/build/bin/macosArm64/debugShared/libaccount_ledger_lib.dylib"
+OTHER_LDFLAGS = $(inherited) -framework IOKit "$(PROJECT_DIR)/../account_ledger_lib_kotlin_native/lib/build/bin/macos$(CURRENT_ARCH)/debugShared/libaccount_ledger_lib.dylib"
 SWIFT_OBJC_BRIDGING_HEADER = Runner/Runner-Bridging-Header.h

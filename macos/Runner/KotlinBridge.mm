@@ -7,18 +7,26 @@
 
 + (int)getBatteryLevel {
     CFTypeRef blob = IOPSCopyPowerSourcesInfo();
+    if (!blob) {
+        return -1;
+    }
+    
     CFArrayRef sources = IOPSCopyPowerSourcesList(blob);
+    if (!sources) {
+        CFRelease(blob);
+        return -1;
+    }
     
     if (CFArrayGetCount(sources) == 0) {
-        CFRelease(blob);
         CFRelease(sources);
+        CFRelease(blob);
         return -1;
     }
     
     CFDictionaryRef pSource = IOPSGetPowerSourceDescription(blob, CFArrayGetValueAtIndex(sources, 0));
     if (!pSource) {
-        CFRelease(blob);
         CFRelease(sources);
+        CFRelease(blob);
         return -1;
     }
     
@@ -36,8 +44,8 @@
         CFNumberGetValue((CFNumberRef)psValue, kCFNumberIntType, &maxCapacity);
     }
     
-    CFRelease(blob);
     CFRelease(sources);
+    CFRelease(blob);
     
     return (int)((double)curCapacity / (double)maxCapacity * 100.0);
 }
@@ -62,15 +70,23 @@
         } else if ([@"getGistData" isEqualToString:call.method]) {
             NSDictionary* args = call.arguments;
             
+            NSString* username = args[@"USERNAME"];
+            NSString* token = args[@"GITHUB_ACCESS_TOKEN"];
+            NSString* gistId = args[@"GIST_ID"];
+            
+            // Validate required parameters
+            if (!username || !token || !gistId) {
+                result([FlutterError errorWithCode:@"INVALID_ARGUMENTS"
+                                           message:@"Missing required parameters: USERNAME, GITHUB_ACCESS_TOKEN, or GIST_ID"
+                                           details:nil]);
+                return;
+            }
+            
             libaccount_ledger_lib_ExportedSymbols *lib = libaccount_ledger_lib_symbols();
             
             libaccount_ledger_lib_kref_account_ledger_library_utils_GistUtilsInteractiveNative newInstance = lib->kotlin.root.account_ledger_library.utils.GistUtilsInteractiveNative.GistUtilsInteractiveNative();
             libaccount_ledger_lib_kref_kotlin_Function3 dummyFunction;
             dummyFunction.pinned = nullptr;
-            
-            NSString* username = args[@"USERNAME"];
-            NSString* token = args[@"GITHUB_ACCESS_TOKEN"];
-            NSString* gistId = args[@"GIST_ID"];
             
             const char *accountLedgerGistText = lib->kotlin.root.account_ledger_library.utils.GistUtilsInteractiveNative.processGistIdForDataV3(
                 newInstance, 
@@ -84,9 +100,12 @@
                 dummyFunction
             );
             
+            NSString* resultString = [NSString stringWithUTF8String:accountLedgerGistText];
+            
+            // Free Kotlin-allocated string
+            lib->DisposeString(accountLedgerGistText);
             lib->DisposeStablePointer(newInstance.pinned);
             
-            NSString* resultString = [NSString stringWithUTF8String:accountLedgerGistText];
             result(resultString);
         } else {
             result(FlutterMethodNotImplemented);
