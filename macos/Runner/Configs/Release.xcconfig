@@ -3,4 +3,5 @@
 
 // Kotlin Native Library
 OTHER_LDFLAGS = $(inherited) -framework IOKit "$(PROJECT_DIR)/../account_ledger_lib_kotlin_native/lib/build/bin/macos$(CURRENT_ARCH)/releaseShared/libaccount_ledger_lib.dylib"
+HEADER_SEARCH_PATHS = $(inherited) "$(PROJECT_DIR)/../account_ledger_lib_kotlin_native/lib/build/bin/macos$(CURRENT_ARCH)/releaseShared"
 SWIFT_OBJC_BRIDGING_HEADER = Runner/Runner-Bridging-Header.h

@@ -1,5 +1,5 @@
 #import "KotlinBridge.h"
-#import "../../account_ledger_lib_kotlin_native/lib/build/bin/macosArm64/debugShared/libaccount_ledger_lib_api.h"
+#import "libaccount_ledger_lib_api.h"
 #import <IOKit/ps/IOPowerSources.h>
 #import <IOKit/ps/IOPSKeys.h>
 
