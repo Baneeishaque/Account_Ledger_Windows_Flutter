@@ -5,10 +5,16 @@ on:
   pull_request:
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-linux:
     name: Build Linux
     runs-on: ubuntu-latest
+    # Skip push events for automated tool branches (they're always associated with PRs)
+    if: github.event_name != 'push' || (!startsWith(github.ref, 'refs/heads/copilot/') && !startsWith(github.ref, 'refs/heads/renovate/') && !startsWith(github.ref, 'refs/heads/coderabbitai/'))
     steps:
       - uses: actions/checkout@v4
         with:
@@ -28,6 +34,24 @@ jobs:
           configuration_repo: ${{ secrets.CONFIGURATION_REPO }}
           configuration_repo_access_token: ${{ secrets.CONFIGURATION_REPO_ACCESS_TOKEN }}
 
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Cache Kotlin/Native Konan
+        uses: actions/cache@v4
+        with:
+          path: ~/.konan
+          key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-konan-
+
       - uses: ./.github/actions/kotlin-native-build
         with:
           platform_command: ./gradlew linkDebugSharedLinuxX64
@@ -46,6 +70,8 @@ jobs:
   build-windows:
     name: Build Windows
     runs-on: windows-latest
+    # Skip push events for automated tool branches (they're always associated with PRs)
+    if: github.event_name != 'push' || (!startsWith(github.ref, 'refs/heads/copilot/') && !startsWith(github.ref, 'refs/heads/renovate/') && !startsWith(github.ref, 'refs/heads/coderabbitai/'))
     env:
       MISE_DISABLE_BACKENDS: vfox
     steps:
@@ -58,6 +84,22 @@ jobs:
         run: ./.github/scripts/verify-vs-workload.ps1
 
       # - uses: ./.github/actions/install-jq
+
+      - name: Workaround - Temporarily remove Flutter from mise.toml (Windows only)
+        shell: powershell
+        run: |
+          # Read mise.toml and extract Flutter version
+          $content = Get-Content mise.toml -Raw
+          if ($content -match 'flutter\s*=\s*"([^"]+)"') {
+            $flutterVersion = $matches[1]
+            Write-Output "FLUTTER_VERSION=$flutterVersion" >> $env:GITHUB_ENV
+            Write-Host "Extracted Flutter version: $flutterVersion"
+          }
+          # Remove Flutter line from mise.toml for mise install
+          (Get-Content mise.toml) | Where-Object { $_ -notmatch '^flutter\s*=' } | Set-Content mise.toml.tmp
+          Move-Item -Force mise.toml.tmp mise.toml
+          Write-Host "Temporarily removed Flutter from mise.toml"
+          Get-Content mise.toml
 
       - uses: ./.github/actions/setup-mise
 
@@ -75,6 +117,24 @@ jobs:
         with:
           configuration_repo: ${{ secrets.CONFIGURATION_REPO }}
           configuration_repo_access_token: ${{ secrets.CONFIGURATION_REPO_ACCESS_TOKEN }}
+
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Cache Kotlin/Native Konan
+        uses: actions/cache@v4
+        with:
+          path: ~/.konan
+          key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-konan-
 
       - uses: ./.github/actions/kotlin-native-build
         with:
