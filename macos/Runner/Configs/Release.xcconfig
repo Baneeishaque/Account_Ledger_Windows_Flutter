@@ -1,6 +1,10 @@
 #include "../../Flutter/Flutter-Release.xcconfig"
 #include "Warnings.xcconfig"
 
+// Only build for ARM64 (matches Kotlin library availability)
+ARCHS = arm64
+ONLY_ACTIVE_ARCH = YES
+
 // Kotlin Native Library
 OTHER_LDFLAGS = $(inherited) -framework IOKit "$(PROJECT_DIR)/../account_ledger_lib_kotlin_native/lib/build/bin/macosArm64/releaseShared/libaccount_ledger_lib.dylib"
 SWIFT_OBJC_BRIDGING_HEADER = Runner/Runner-Bridging-Header.h
