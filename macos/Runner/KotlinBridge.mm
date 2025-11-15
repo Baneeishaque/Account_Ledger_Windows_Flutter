@@ -2,6 +2,7 @@
 #import "../../account_ledger_lib_kotlin_native/lib/build/bin/macosArm64/releaseShared/libaccount_ledger_lib_api.h"
 #import <IOKit/ps/IOPowerSources.h>
 #import <IOKit/ps/IOPSKeys.h>
+#import <unistd.h>
 
 @implementation KotlinBridge
 
@@ -88,6 +89,13 @@
             libaccount_ledger_lib_kref_kotlin_Function3 dummyFunction;
             dummyFunction.pinned = nullptr;
             
+            // Redirect stdout to capture the JSON output
+            int stdout_backup = dup(STDOUT_FILENO);
+            int pipefd[2];
+            pipe(pipefd);
+            dup2(pipefd[1], STDOUT_FILENO);
+            
+            // Call the function with isApiCall=true to print JSON
             libaccount_ledger_lib_kref_account_ledger_library_models_AccountLedgerGistModelV3 gistModel = lib->kotlin.root.account_ledger_library.utils.GistUtilsInteractiveNative.processGistIdForDataV3(
                 newInstance, 
                 [username UTF8String], 
@@ -95,14 +103,33 @@
                 [token UTF8String], 
                 [gistId UTF8String], 
                 false, 
-                false, 
+                true,  // isApiCall=true to print JSON
                 false, 
                 dummyFunction
             );
             
-            const char *accountLedgerGistText = lib->kotlin.root.account_ledger_library.models.AccountLedgerGistModelV3._text.getter(gistModel);
+            // Restore stdout
+            fflush(stdout);
+            dup2(stdout_backup, STDOUT_FILENO);
+            close(pipefd[1]);
+            close(stdout_backup);
             
-            NSString* resultString = [NSString stringWithUTF8String:accountLedgerGistText];
+            // Read captured output
+            char buffer[65536];
+            ssize_t count = read(pipefd[0], buffer, sizeof(buffer) - 1);
+            close(pipefd[0]);
+            
+            if (count > 0) {
+                buffer[count] = '\0';
+                // Remove trailing newline if present
+                if (count > 0 && buffer[count - 1] == '\n') {
+                    buffer[count - 1] = '\0';
+                }
+            } else {
+                buffer[0] = '\0';
+            }
+            
+            NSString* resultString = [NSString stringWithUTF8String:buffer];
             
             // Free Kotlin-allocated resources
             lib->DisposeStablePointer(gistModel.pinned);
