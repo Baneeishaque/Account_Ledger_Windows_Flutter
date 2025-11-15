@@ -5,6 +5,9 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build-linux:
     name: Build Linux
@@ -146,3 +149,35 @@ jobs:
         with:
           artifact_name: windows-build
           artifact_path: build/windows/runner/Release
+
+  build-macos:
+    name: Build macOS
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+      - uses: ./.github/actions/install-jq
+
+      - uses: ./.github/actions/setup-mise
+
+      - uses: ./.github/actions/clone-env
+        with:
+          configuration_repo: ${{ secrets.CONFIGURATION_REPO }}
+          configuration_repo_access_token: ${{ secrets.CONFIGURATION_REPO_ACCESS_TOKEN }}
+
+      - uses: ./.github/actions/kotlin-native-build
+        with:
+          platform_command: ./gradlew linkReleaseSharedMacosArm64
+
+      - uses: ./.github/actions/flutter-setup
+
+      - uses: ./.github/actions/flutter-app-build
+        with:
+          platform_command: flutter build macos --release
+
+      - uses: ./.github/actions/upload-artifact
+        with:
+          artifact_name: macos-build
+          artifact_path: build/macos/Build/Products/Release
