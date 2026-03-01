@@ -5,11 +5,10 @@
 import FlutterMacOS
 import Foundation
 
-import url_launcher_macos
+import audioplayers_darwin
+import path_provider_foundation
 
-/// Registers the generated Flutter plugins with the provided plugin registry.
-/// - Parameters:
-///   - registry: The `FlutterPluginRegistry` used to obtain plugin registrars for registering plugins.
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
-  UrlLauncherPlugin.register(with: registry.registrar(forPlugin: "UrlLauncherPlugin"))
+  AudioplayersDarwinPlugin.register(with: registry.registrar(forPlugin: "AudioplayersDarwinPlugin"))
+  PathProviderPlugin.register(with: registry.registrar(forPlugin: "PathProviderPlugin"))
 }
