@@ -38,7 +38,7 @@ jobs:
           configuration_repo_access_token: ${{ secrets.CONFIGURATION_REPO_ACCESS_TOKEN }}
 
       - name: Cache Gradle dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.gradle/caches
@@ -48,7 +48,7 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Cache Kotlin/Native Konan
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle.properties') }}
@@ -122,7 +122,7 @@ jobs:
           configuration_repo_access_token: ${{ secrets.CONFIGURATION_REPO_ACCESS_TOKEN }}
 
       - name: Cache Gradle dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.gradle/caches
@@ -132,7 +132,7 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Cache Kotlin/Native Konan
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle.properties') }}
