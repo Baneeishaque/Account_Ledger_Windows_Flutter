@@ -107,7 +107,7 @@ jobs:
       - uses: ./.github/actions/setup-mise
 
       - name: Setup Scoop
-        uses: MinoruSekine/setup-scoop@v4
+        uses: MinoruSekine/setup-scoop@v5
 
       - name: Install vfox CLI via Scoop
         run: scoop install vfox
