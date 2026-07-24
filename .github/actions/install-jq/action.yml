@@ -4,4 +4,4 @@ runs:
   using: 'composite'
   steps:
     - name: Install jq
-      uses: dcarbone/install-jq-action@v3.2.0
+      uses: dcarbone/install-jq-action@v4.0.1
