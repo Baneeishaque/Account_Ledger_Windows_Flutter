@@ -6,5 +6,7 @@ ARCHS = arm64
 ONLY_ACTIVE_ARCH = YES
 
 // Kotlin Native Library
-OTHER_LDFLAGS = $(inherited) -framework IOKit "$(PROJECT_DIR)/../account_ledger_lib_kotlin_native/lib/build/bin/macosArm64/releaseShared/libaccount_ledger_lib.dylib"
+// Use rpath-based linking so the library can be bundled with the app
+LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/../Frameworks
+OTHER_LDFLAGS = $(inherited) -framework IOKit -Xlinker -rpath -Xlinker @executable_path/../Frameworks "$(PROJECT_DIR)/../account_ledger_lib_kotlin_native/lib/build/bin/macosArm64/releaseShared/libaccount_ledger_lib.dylib"
 SWIFT_OBJC_BRIDGING_HEADER = Runner/Runner-Bridging-Header.h
