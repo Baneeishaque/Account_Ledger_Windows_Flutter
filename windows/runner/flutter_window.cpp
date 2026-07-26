@@ -75,11 +75,39 @@ bool FlutterWindow::OnCreate() {
 
                 account_ledger_lib_ExportedSymbols *lib = account_ledger_lib_symbols();
 
-                account_ledger_lib_kref_account_ledger_library_utils_GistUtils newInstance = lib->kotlin.root.account_ledger_library.utils.GistUtils.GistUtils();
-                string accountLedgerGistText = lib->kotlin.root.account_ledger_library.utils.GistUtils.processGistIdForTextData(newInstance, (static_cast<string> (std::get<string>(argsList->find(flutter::EncodableValue("USERNAME"))->second))).data(), 0, (static_cast<string> (std::get<string>(argsList->find(flutter::EncodableValue("GITHUB_ACCESS_TOKEN"))->second))).data(), (static_cast<string> (std::get<string>(argsList->find(flutter::EncodableValue("GIST_ID"))->second))).data(), false, false);
-                lib->DisposeStablePointer(newInstance.pinned);
+                // Get singleton instances for Kotlin objects
+                account_ledger_lib_kref_common_utils_library_utils_GistUtilsCommonNative gistUtilsCommon = lib->kotlin.root.common_utils_library.utils.GistUtilsCommonNative._instance();
+                account_ledger_lib_kref_common_utils_library_utils_GistUtilsInteractiveCommonNative gistUtilsInteractive = lib->kotlin.root.common_utils_library.utils.GistUtilsInteractiveCommonNative._instance();
 
-                result->Success(accountLedgerGistText);
+                // Get HTTP client for GitHub API
+                account_ledger_lib_kref_io_ktor_client_HttpClient httpClient = lib->kotlin.root.common_utils_library.utils.GistUtilsCommonNative.getHttpClientForGitHub(
+                    gistUtilsCommon,
+                    (static_cast<string> (std::get<string>(argsList->find(flutter::EncodableValue("GITHUB_ACCESS_TOKEN"))->second))).data(),
+                    false
+                );
+
+                // Get Gist contents
+                account_ledger_lib_kref_common_utils_library_models_Root gistRoot = lib->kotlin.root.common_utils_library.utils.GistUtilsInteractiveCommonNative.getGistContents(
+                    gistUtilsInteractive,
+                    httpClient,
+                    (static_cast<string> (std::get<string>(argsList->find(flutter::EncodableValue("GIST_ID"))->second))).data(),
+                    false
+                );
+
+                // Access the content string from the Root object
+                account_ledger_lib_kref_common_utils_library_models_Files files = lib->kotlin.root.common_utils_library.models.Root.get_files(gistRoot);
+                account_ledger_lib_kref_common_utils_library_models_MainTxt mainTxt = lib->kotlin.root.common_utils_library.models.Files.get_mainTxt(files);
+                const char* accountLedgerGistText = lib->kotlin.root.common_utils_library.models.MainTxt.get_content(mainTxt);
+
+                result->Success(string(accountLedgerGistText));
+
+                // Clean up
+                lib->DisposeStablePointer(gistUtilsCommon.pinned);
+                lib->DisposeStablePointer(gistUtilsInteractive.pinned);
+                lib->DisposeStablePointer(httpClient.pinned);
+                lib->DisposeStablePointer(gistRoot.pinned);
+                lib->DisposeStablePointer(files.pinned);
+                lib->DisposeStablePointer(mainTxt.pinned);
 
               } else {
                   result->NotImplemented();
